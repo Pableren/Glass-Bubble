@@ -68,7 +68,7 @@ El tablero incluye un panel interactivo que permite a los usuarios explorar los 
 
 ### Logica de las predicciones
 
-#### Aclaracion: El precio del bitcoin es influenciado por muchos valores externos, y es verdaderamente complicado tambien asi, demostrar que esos valores externos son realmente la causa del valor del activo y no una casualidad debido a que: *correlacion no implica causalidad*. Dicho esto, el modelo utilizado fue un LSTM
+#### Aclaracion: El precio del bitcoin es influenciado por muchos valores externos, y es verdaderamente complicado tambien asi, demostrar que esos valores externos son realmente la causa del valor del activo y no una casualidad debido a que: *correlacion no implica causalidad*. Dicho esto, el modelo utilizado fue un ForecasterAutoregresivo.
 
 El precio del Bitcoin es altamente volátil debido a:
 - Su naturaleza descentralizada: Sin un banco central que controle la oferta, el mercado es más susceptible a cambios bruscos.
@@ -77,6 +77,13 @@ El precio del Bitcoin es altamente volátil debido a:
 
 Explica la lógica de las predicciones: ¿Qué tipo de modelo de machine learning se utilizará? ¿Cuáles son las características que se utilizarán para realizar las predicciones?
 Detalla la arquitectura: ¿Cómo se conectan los diferentes componentes del tablero? ¿Cuál es el flujo de datos desde la API hasta la interfaz de usuario?
+
+#### ¿Porque se eligio un ForecasterAutoregresivo?
+
+- Captura de dependencias temporales: Los modelos autoregresivos están diseñados para capturar la dependencia entre los valores pasados y futuros de una serie de tiempo, lo que es fundamental para realizar predicciones precisas.
+- Manejo de series de tiempo con estacionalidad: LightGBM puede manejar fácilmente la estacionalidad en las series de tiempo, lo que es común en muchos conjuntos de datos reales.
+- Alta precisión: LightGBM es un algoritmo de boosting muy eficiente y preciso, lo que lo convierte en una excelente opción para modelos de predicción de series de tiempo.
+- Flexibilidad: Permite la creación de modelos complejos que combinan múltiples características y técnicas de modelado.
 
 ## Upgrades:
 
