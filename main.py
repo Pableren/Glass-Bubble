@@ -3,7 +3,8 @@ import plotly.express as px
 import streamlit as st
 import sqlite3 as sql
 import Scripts.db_crud as db
-from Scripts.train_save_model import entrenar_modelo_predicciones
+import Scripts.model_script as func
+import plotly.graph_objects as go
 #streamlit run main.py
 # Conectar a la base de datos
 conn = sql.connect('Data/db/btc.db')
@@ -68,13 +69,40 @@ if st.button('Actualizar Datos'):
     data_5m = pd.read_sql_query("SELECT * FROM btc_5m", conn)
 
 if st.button('Entrenar Modelo'):
-    prediccion, actual = entrenar_modelo_predicciones(df=data_1d)
-    datos_plot = pd.DataFrame({'actual': actual['close'], 'prediccion': prediccion['pred']})
-    valores_graficos = pd.DataFrame({'ma_5': actual['ma_5'], 'ma_20': actual['ma_20'], 'ma_100': actual['ma_100']})
-    valores_graficos_recortado = valores_graficos.tail(500)
-    datos_plot_recortado = datos_plot.tail(500)
-    df_concatenado = pd.concat([datos_plot_recortado, valores_graficos_recortado], ignore_index=False, join='outer')
-    fig_1d = px.line(df_concatenado, x=df_concatenado.index, y=df_concatenado.columns, title='btc close vs predict')
+    #prediccion, actual = func.predict(db_path='Data/db/btc.db')
+    data= func.load_and_prepare_data('Data/db/btc.db')
+    predictions = func.create_and_train_model(data)
+    print(predictions)
+    #ultimos_valores_close = data['close'].iloc[-100:]
+    fig_1d = go.Figure()
+    # Agregar los valores reales (últimos 10 valores)
+    fig_1d.add_trace(go.Scatter(x=data.index[-500:], y=data.close.values[-500:], 
+                         mode='lines+markers', 
+                         name='Valores Reales', 
+                         marker=dict(color='blue', symbol='cross')))
+    fig_1d.add_trace(go.Scatter(x=predictions.index, y=predictions.values, 
+                         mode='lines+markers', 
+                         name='Predicciones en 5 Pasos', 
+                         marker=dict(color='green')))
+    #datos_plot = pd.DataFrame({'actual': data['close'], 'prediccion': predictions.values})
+    #valores_graficos = pd.DataFrame({'ma_5': data['ma_5'], 'ma_20': data['ma_20'], 'ma_100': data['ma_100']})
+    
+    fig_1d.update_layout(
+        title='Predicciones sobre Últimos 5 Valores y Futuras',
+        xaxis_title='Fecha',
+        yaxis_title='Precio',
+        legend=dict(x=0, y=1.1),
+        margin=dict(l=40, r=40, t=40, b=40),
+        hovermode='x',
+        paper_bgcolor='dodgerblue',
+        plot_bgcolor='deepskyblue',
+        template='plotly_white')
+    #fig.show()
+    #st.plotly_chart(fig)
+    #valores_graficos_recortado = valores_graficos.tail(500)
+    #datos_plot_recortado = datos_plot.tail(500)
+    #df_concatenado = pd.concat([datos_plot_recortado, valores_graficos_recortado], ignore_index=False, join='outer')
+    #fig_1d = px.line(df_concatenado, x=df_concatenado.index, y=df_concatenado.columns, title='btc close vs predict')
 else:
     # Gráficas iniciales
     fig_1d = px.line(data_1d, x='date', y=['close', 'ma_5', 'ma_20', 'ma_100'], title='btc close vs predictions 1d')
