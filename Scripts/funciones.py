@@ -78,8 +78,11 @@ def calcular_recompensa_y_cuenta_regresiva_df4(df_4h, bloques_minados_hasta_hoy=
 
 
 def calcular_recompensa_y_cuenta_regresiva_1d(df_1d, bloques_minados_hasta_hoy=740000):
+    #if 'date' in df_1d.columns:
     df_1d['date'] = pd.to_datetime(df_1d['date'])
     df_1d.set_index(keys='date', inplace=True)
+    #df_1d['date'] = pd.to_datetime(df_1d['date'])
+    #df_1d.set_index(keys='date', inplace=True)
 
     btc_halving = {
         'halving': [0, 1, 2, 3, 4],
@@ -306,21 +309,56 @@ def etl_1d_4h(df):
     df['lag2_TR'] = df['TR'].shift(90)
     df['lag1_ATR'] = df['ATR'].shift(45)
     df['lag2_ATR'] = df['ATR'].shift(90)
-    ## Obtener la fecha de ayer
-    #last_timestamp = df['time'].iloc[-1]
-    #last_timestamp = float(last_timestamp)
-    #df['date'] = df['time'].apply(lambda x: today - timedelta(milliseconds=(last_timestamp - int(x))))
-    #df['date'] = df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')
-    #last_timestamp = df['time'].iloc[-1]
-    #print(last_timestamp)
-    #last_timestamp = float(last_timestamp)
-    #print(last_timestamp)
-    #df['date'] = df['time'].apply(lambda x: today - timedelta(milliseconds=(last_timestamp - float(x))))
-    #print("df date despues de apply",df[['date','time']].tail())
-    #df['date'] = df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')
-    #print("df date despues de strftime",df[['date','time']].tail())
     df['date'] = pd.to_datetime(df['time'], unit='ms')
     #df['date'] = pd.to_datetime(df['time'], unit='ms').dt.normalize()
     df['date'] = df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')
     return df
 
+
+
+
+def calcular_recompensa_y_cuenta_regresiva_1d_future(df_1d, bloques_minados_hasta_hoy=740000):
+    btc_halving = {
+        'halving': [0, 1, 2, 3, 4],
+        'date': ['2009-01-03', '2012-11-28', '2016-07-09', '2020-05-11', np.nan],
+        'reward': [50, 25, 12.5, 6.25, 3.125],
+        'halving_block_number': [0, 210000, 420000, 630000, 840000]
+    }
+
+    bloques_por_dia = 144
+    bloques_restantes = 840000 - bloques_minados_hasta_hoy
+    dias_restantes = bloques_restantes / bloques_por_dia
+    fecha_actual = pd.to_datetime('today').replace(microsecond=0, second=0, minute=0, hour=0)
+    next_halving = fecha_actual + timedelta(days=dias_restantes)
+    btc_halving['date'][-1] = next_halving.strftime('%Y-%m-%d %H:%M:%S')
+
+    print(f'El próximo halving ocurrirá aproximadamente el: {btc_halving["date"][-1]}')
+
+    df_1d['reward'] = np.nan
+    df_1d['countdown_halving'] = np.nan
+
+    for i in range(len(btc_halving['halving']) - 1):
+        start_date = max(pd.to_datetime(btc_halving['date'][i]), df_1d.index.min())
+        end_date = pd.to_datetime(btc_halving['date'][i + 1])
+        mask = (df_1d.index >= start_date) & (df_1d.index < end_date)
+
+        df_1d.loc[mask, 'reward'] = btc_halving['reward'][i]
+
+        if mask.sum() > 0:
+            dates_in_mask = pd.date_range(start=start_date, end=end_date, periods=mask.sum())
+            countdown_values = (end_date - dates_in_mask).days
+            df_1d.loc[mask, 'countdown_halving'] = countdown_values
+
+    last_halving_date = pd.to_datetime(btc_halving['date'][-2])
+    next_halving_date = pd.to_datetime(btc_halving['date'][-1])
+
+    if df_1d.index.max() >= last_halving_date:
+        mask = (df_1d.index >= last_halving_date) & (df_1d.index < next_halving_date)
+        df_1d.loc[mask, 'reward'] = btc_halving['reward'][-1]
+
+        if mask.sum() > 0:
+            dates_in_mask = pd.date_range(start=last_halving_date, end=next_halving_date, periods=mask.sum())
+            countdown_values = (next_halving_date - dates_in_mask).days
+            df_1d.loc[mask, 'countdown_halving'] = countdown_values
+    #df_1d.reset_index(inplace=True)
+    return df_1d
