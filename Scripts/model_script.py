@@ -52,7 +52,7 @@ def preprocesar_df_futuro(df_actual):
     return df_and_future
 
 
-def preprocesar_df_futuro_sin_recompensa(df_actual):
+def preprocesar_df_futuro_sin_exog(df_actual):
     fecha_maxima = df_actual.index.max()
     una_semana_mas = fecha_maxima + pd.DateOffset(days=5)
     future = pd.date_range(fecha_maxima+ pd.DateOffset(days=1), una_semana_mas, freq='D')
@@ -84,7 +84,6 @@ def preprocesar_df_futuro_sin_recompensa(df_actual):
     df_and_future['index'] = fechas
     df_and_future.index = fechas
     return df_and_future
-
 
 
 
@@ -122,8 +121,52 @@ def create_and_train_model(data, lags=[1,30,90,180], steps=5):
     horizonte = steps
     df_and_future = preprocesar_df_futuro(df_actual=data)
     predicciones = forecaster.predict(steps=horizonte, exog=df_and_future[exog].iloc[-horizonte:])
-    
     return predicciones
+
+def reordenar_fechas(data,temporalidad):
+    fecha = data['date'][-1:].values[0]
+    ultima_fecha = pd.to_datetime(fecha)
+    num_instancias = len(data)
+    if (temporalidad=='4h'):
+        fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='4H')
+        data['date'] = fechas
+        data.index = fechas
+    elif (temporalidad=='1h'):
+        fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='1H')
+        data['date'] = fechas
+        data.index = fechas
+    elif (temporalidad=='5m'):
+        fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='5min')
+        data['date'] = fechas
+        data.index = fechas
+    return data
+
+def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=None):
+    forecaster = ForecasterAutoreg(regressor=LGBMRegressor(random_state=42, verbose=-1), lags=lags)
+    data.fillna(0,inplace=True)
+    data = reordenar_fechas(data,temporalidad=temporalidad)
+    last_date = data['date'][-1:].values[0]
+    first_date = data['date'][:2].values[0]
+    inicio_train = first_date
+    fin_train = last_date - pd.DateOffset(days=365)
+    metrica, predicciones = backtesting_forecaster(
+        forecaster         = forecaster,
+        y                  = data.loc[inicio_train:, 'close'],
+        initial_train_size = len(data.loc[inicio_train:fin_train,]),
+        fixed_train_size   = True,
+        steps              = 2,
+        refit              = True,
+        metric             = 'mean_absolute_percentage_error',
+        verbose            = False,
+        show_progress      = True
+        )
+    forecaster.fit(y=data['close'])
+    pred_ultimo_valor = forecaster.predict(steps=5)
+    pred_ultimo_valor = pd.DataFrame(pred_ultimo_valor)
+    predicciones_4h = pd.concat(objs=[predicciones,pred_ultimo_valor], axis=0)
+    print("predicciones ",predicciones_4h)
+    return predicciones_4h
+
 
 def predict(db_path, lags=[1,30,90,180], steps=5):
     # Cargar y preparar los datos
