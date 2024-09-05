@@ -107,6 +107,24 @@ def load_and_prepare_data(db_path):
     data = pd.get_dummies(df_1d, columns=['reward', 'mes'], dtype=int)
     return data
 
+def load_and_prepare_data_sin_exog(db_path,temporalidad):
+    conn = sql.connect(db_path)
+    data = pd.read_sql_query(f"SELECT * FROM btc_{temporalidad}", conn)
+    conn.close()
+    data.drop(columns=['open', 'high', 'low', 'volume', 'return', 'diff', 'volatility', 
+        'rsi_14', 'rsi_28', 'rsi_14_shifted', 'rsi_28_shifted', 'ma_5', 'ma_20', 
+        'ma_100', 'MiddleBand', 'UpperBand', 'LowerBand', 'K', 'D', 'close_shifted', 
+        'TR', 'ATR', 'TP', 'CCI', 'lag1_TR', 'lag2_TR', 'lag1_ATR', 'lag2_ATR'], inplace=True)
+    #fecha = df_1d['date'][-1:].values[0]
+    #ultima_fecha = pd.to_datetime(fecha)
+    #num_dias = len(df_1d)
+    #fechas = pd.date_range(end=ultima_fecha, periods=num_dias)
+    #df_1d['date'] = fechas
+    #df_1d.index = fechas
+    #df_1d['mes'] = df_1d.index.month
+    #data = pd.get_dummies(df_1d, columns=['reward', 'mes'], dtype=int)
+    return data
+
 # Function to create and train the model
 def create_and_train_model(data, lags=[1,30,90,180], steps=5):
     exog = [column for column in data.columns if column.startswith(('reward', 'mes'))]
@@ -154,7 +172,7 @@ def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=No
         y                  = data.loc[inicio_train:, 'close'],
         initial_train_size = len(data.loc[inicio_train:fin_train,]),
         fixed_train_size   = True,
-        steps              = 2,
+        steps              = 1,
         refit              = True,
         metric             = 'mean_absolute_percentage_error',
         verbose            = False,
@@ -175,6 +193,15 @@ def predict(db_path, lags=[1,30,90,180], steps=5):
     # Crear, entrenar el modelo y realizar predicciones
     predicciones = create_and_train_model(data=data, lags=lags, steps=steps)
     return predicciones,data
+
+def predict_sin_exog(db_path, lags=[1,30,90,180], steps=5,temporalidad=None):
+    # Cargar y preparar los datos
+    data = load_and_prepare_data_sin_exog(db_path,temporalidad=temporalidad)
+    # Preprocesar el dataframe futuro
+    # Crear, entrenar el modelo y realizar predicciones
+    predicciones = create_train_model_sin_exog(data=data, lags=lags, steps=steps,temporalidad=temporalidad)
+    return predicciones
+
 # Main script execution
 #print(predict(df_actual="Data/db/btc.db"))
 if __name__ == "__main__":
