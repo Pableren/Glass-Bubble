@@ -383,21 +383,21 @@ def cortar_data(df):
 
 if __name__ == "__main__":
     #createDB() # creacion de la base
-    #eliminarTabla(tabla='btc_1d')
+    eliminarTabla(tabla='btc_1d')
     
-    #createTable_1d(nombre_tabla='btc_1d')
+    createTable_1d(nombre_tabla='btc_1d')
     #createTable_4h(nombre_tabla='btc_4h')
     #createTable_1h_5m(nombre_tabla='btc_1h')
     #createTable_1h_5m(nombre_tabla='btc_5m')
     
     #cortar_data('btc_1h')
     
-    #insertRows(tabla='btc_1d')
+    insertRows(tabla='btc_1d')
     #insertMany(lista_tuplas)
     
     #actualizarData1h() #correcta
     #actualizarData4h() # Correcta
-    actualizarData1d() # correcta
+    #actualizarData1d() # correcta
     #actualizarData5m() # correcta 
 
 
