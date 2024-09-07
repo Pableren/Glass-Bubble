@@ -62,7 +62,7 @@ def crear_grafico_predicciones(data, predictions, temporalidad):
         template='plotly_white'
     )
     return fig
-
+st.set_page_config(layout="wide")  # Esto asegura que el ancho completo se use
 st.title("Btc prediction with Streamlit")
 lista_temporalidades = ['1D', '4H', '1H', '5M']
 graficas = {}
@@ -114,24 +114,113 @@ def create_info_table(volume, volatility):
 
 temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades)
 
+# Crear columnas: la primera columna será el panel de información y la segunda columna los gráficos
+col1, col2 = st.columns([1, 3])  # Ajusta las proporciones de ancho
+
 # Cargar los datos según la temporalidad seleccionada
 data = cargar_datos(temporalidad_seleccionada)
 
 info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
 
-# Botón para actualizar datos
-if st.button('Actualizar Datos'):
-    db.actualizarData1d()
 
-# Botón para entrenar modelo
-if st.button('Entrenar Modelo'):
-    data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
-    # Reemplazar el gráfico original de la temporalidad seleccionada con el nuevo gráfico de predicciones
-    graficas_placeholders[temporalidad_seleccionada].plotly_chart(crear_grafico_predicciones(data, predictions, temporalidad_seleccionada))
+# Mostrar el panel de información en la columna izquierda
+with col1:
+    st.subheader("Panel de Información")
     
+    # Cargar los datos para la tabla de información
+    data = cargar_datos(temporalidad_seleccionada)
+    info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
+    st.table(info_panel_table)  # Mostrar tabla
     
-    #graficas[temporalidad_seleccionada] = crear_grafico_predicciones(data, predictions, temporalidad_seleccionada)
-    #st.plotly_chart(graficas[temporalidad_seleccionada])
+    # Colocar botones debajo del panel de información
+    if st.button('Actualizar Datos'):
+        if temporalidad_seleccionada=='1D':
+            db.actualizarData1d()
+        elif temporalidad_seleccionada=='4H':
+            db.actualizarData4h()
+        elif temporalidad_seleccionada=='1H':
+            db.actualizarData1h()
+        elif temporalidad_seleccionada=='5M':
+            db.actualizarData5m()
+        data = cargar_datos(temporalidad_seleccionada)
+    
+    if st.button('Entrenar Modelo'):
+        data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
+
+# Mostrar gráficos en la columna derecha
+with col2:
+    st.subheader(f"Gráficos {temporalidad_seleccionada}")
+    st.plotly_chart(crear_grafico_valores_reales(data, temporalidad_seleccionada))
+
+
+# Mostrar el panel de información en la columna izquierda
+#with col1:
+#    st.subheader("Panel de Información")
+#    st.table(info_panel_table)
+#
+## Mostrar gráficos en la columna derecha
+#with col2:
+#    st.subheader(f"Gráficos {temporalidad_seleccionada}")
+#    st.plotly_chart(crear_grafico_valores_reales(data, temporalidad_seleccionada))
+#
+#    # Actualizar gráficos al presionar los botones
+#    if st.button('Actualizar Datos'):
+#        if temporalidad_seleccionada == '1D':
+#            db.actualizarData1d()
+#        elif temporalidad_seleccionada == '4H':
+#            db.actualizarData4h()
+#        elif temporalidad_seleccionada == '1H':
+#            db.actualizarData1h()
+#        elif temporalidad_seleccionada == '5M':
+#            db.actualizarData5m()
+#        # Volver a cargar los datos después de la actualización
+#        data = cargar_datos(temporalidad_seleccionada)
+#        # Actualizar el gráfico con los datos crudos
+#        graficas_placeholders[temporalidad_seleccionada].plotly_chart(crear_grafico_valores_reales(data, temporalidad_seleccionada))
+#
+#    # Botón para entrenar modelo
+#    
+## Botón para entrenar modelo
+#    if st.button('Entrenar Modelo'):
+#        data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
+#        # Reemplazar el gráfico original de la temporalidad seleccionada con el nuevo gráfico de predicciones
+#        graficas_placeholders[temporalidad_seleccionada].plotly_chart(crear_grafico_predicciones(data, predictions, temporalidad_seleccionada))
+#
+#
+#        #graficas[temporalidad_seleccionada] = crear_grafico_predicciones(data, predictions, temporalidad_seleccionada)
+#        #st.plotly_chart(graficas[temporalidad_seleccionada])
+
+
+
+# Botón para actualizar datos según la temporalidad
+# Actualizar gráficos al presionar los botones
+#if st.button('Actualizar Datos'):
+#    if temporalidad_seleccionada == '1D':
+#        db.actualizarData1d()
+#    elif temporalidad_seleccionada == '4H':
+#        db.actualizarData4h()
+#    elif temporalidad_seleccionada == '1H':
+#        db.actualizarData1h()
+#    elif temporalidad_seleccionada == '5M':
+#        db.actualizarData5m()
+#    # Volver a cargar los datos después de la actualización
+#    data = cargar_datos(temporalidad_seleccionada)
+#    # Actualizar el gráfico con los datos crudos
+#    graficas_placeholders[temporalidad_seleccionada].plotly_chart(crear_grafico_valores_reales(data, temporalidad_seleccionada))#
+#
+
+## Botón para entrenar modelo
+#if st.button('Entrenar Modelo'):
+#    data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
+#    # Reemplazar el gráfico original de la temporalidad seleccionada con el nuevo gráfico de predicciones
+#    graficas_placeholders[temporalidad_seleccionada].plotly_chart(crear_grafico_predicciones(data, predictions, temporalidad_seleccionada))
+#    
+#    
+#    #graficas[temporalidad_seleccionada] = crear_grafico_predicciones(data, predictions, temporalidad_seleccionada)
+#    #st.plotly_chart(graficas[temporalidad_seleccionada])
+
+
+
 
 # Mostrar gráficos con predicciones si ya se entrenaron
 if graficas_predicciones:
@@ -140,8 +229,8 @@ if graficas_predicciones:
         st.plotly_chart(grafico)
 
 # Mostrar tabla de información
-st.subheader("Panel de Información")
-st.table(info_panel_table)
+#st.subheader("Panel de Información")
+#st.table(info_panel_table)
 
 
 
