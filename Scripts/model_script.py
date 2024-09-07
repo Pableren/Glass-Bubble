@@ -115,14 +115,6 @@ def load_and_prepare_data_sin_exog(db_path,temporalidad):
         'rsi_14', 'rsi_28', 'rsi_14_shifted', 'rsi_28_shifted', 'ma_5', 'ma_20', 
         'ma_100', 'MiddleBand', 'UpperBand', 'LowerBand', 'K', 'D', 'close_shifted', 
         'TR', 'ATR', 'TP', 'CCI', 'lag1_TR', 'lag2_TR', 'lag1_ATR', 'lag2_ATR'], inplace=True)
-    #fecha = df_1d['date'][-1:].values[0]
-    #ultima_fecha = pd.to_datetime(fecha)
-    #num_dias = len(df_1d)
-    #fechas = pd.date_range(end=ultima_fecha, periods=num_dias)
-    #df_1d['date'] = fechas
-    #df_1d.index = fechas
-    #df_1d['mes'] = df_1d.index.month
-    #data = pd.get_dummies(df_1d, columns=['reward', 'mes'], dtype=int)
     return data
 
 # Function to create and train the model
@@ -145,32 +137,67 @@ def reordenar_fechas(data,temporalidad):
     fecha = data['date'][-1:].values[0]
     ultima_fecha = pd.to_datetime(fecha)
     num_instancias = len(data)
-    if (temporalidad=='4h'):
+    if (temporalidad in ['4h','4H']):
         fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='4H')
+        print("longitud de fechas",len(fechas))
+        print("longitud del indice de df",len(data.index))
         data['date'] = fechas
         data.index = fechas
-    elif (temporalidad=='1h'):
+        print("data reodernar_fechas",data)
+    elif (temporalidad in ['1h','1H']):
         fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='1H')
+        print("longitud de fechas",len(fechas))
         data['date'] = fechas
         data.index = fechas
-    elif (temporalidad=='5m'):
+    elif (temporalidad in ['5m','5M']):
         fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='5min')
+        print("longitud de fechas",len(fechas))
         data['date'] = fechas
         data.index = fechas
+    print("data reodernar_fechas",data)
     return data
 
 def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=None):
     forecaster = ForecasterAutoreg(regressor=LGBMRegressor(random_state=42, verbose=-1), lags=lags)
     data.fillna(0,inplace=True)
     data = reordenar_fechas(data,temporalidad=temporalidad)
+    print(data.tail(3))
+    data['date'] = pd.to_datetime(data['date'])
+    print(data.tail(3))
+    print(data.dtypes)
+    print(pd.__version__)
+    print(np.__version__)
+    #last_date = pd.to_datetime(data['date'][-1:].values[0])
+    #first_date = pd.to_datetime(data['date'][:1].values[0])
     last_date = data['date'][-1:].values[0]
-    first_date = data['date'][:2].values[0]
+    first_date = data['date'][:1].values[0]
     inicio_train = first_date
-    fin_train = last_date - pd.DateOffset(days=365)
+    fin_train = last_date - pd.DateOffset(days=30)
+    print(inicio_train)
+    #last_date = data['date'][-1:].values[0]
+    ##last_date = pd.to_datetime(last_date)
+    #first_date = data['date'][:2].values[0]
+    #first_date_datetime = pd.to_datetime(first_date)
+    #print("first date",first_date_datetime)
+    #inicio_train = first_date_datetime
+    #fin_train = last_date - pd.DateOffset(days=365)
+    #print("inicio_train",inicio_train)
+    #print("inicio_train tipo",type(inicio_train))
+    #print("fin_train",fin_train)
+    #print("fin_train tipo",type(fin_train))
+    inicio_train = pd.to_datetime(inicio_train)
+    formatted_date_inicio = inicio_train.strftime('%Y-%m-%d %H:%M:%S')
+    fin_train = pd.to_datetime(fin_train)
+    formatted_date_fin = fin_train.strftime('%Y-%m-%d %H:%M:%S')
+    # Imprimir las fechas para asegurarse de que sean correctas
+    print("inicio_train:", inicio_train, type(inicio_train))
+    print("fin_train:", fin_train, type(fin_train))
+    #print(len(data.loc[inicio_train:fin_train]))
+    print(len(data.loc[formatted_date_inicio:formatted_date_fin]))
     metrica, predicciones = backtesting_forecaster(
         forecaster         = forecaster,
-        y                  = data.loc[inicio_train:, 'close'],
-        initial_train_size = len(data.loc[inicio_train:fin_train,]),
+        y                  = data.loc[formatted_date_inicio:, 'close'],
+        initial_train_size = len(data.loc[inicio_train:fin_train]),
         fixed_train_size   = True,
         steps              = 1,
         refit              = True,
@@ -202,6 +229,8 @@ def predict_sin_exog(db_path, lags=[1,30,90,180], steps=5,temporalidad=None):
     predicciones = create_train_model_sin_exog(data=data, lags=lags, steps=steps,temporalidad=temporalidad)
     return predicciones
 
+prediciciones = predict_sin_exog(db_path='Data/db/btc.db',temporalidad='4H')
+print(prediciciones)
 # Main script execution
 #print(predict(df_actual="Data/db/btc.db"))
 if __name__ == "__main__":
