@@ -227,10 +227,10 @@ def predict_sin_exog(db_path, lags=[1,30,90,180], steps=5,temporalidad=None):
     # Preprocesar el dataframe futuro
     # Crear, entrenar el modelo y realizar predicciones
     predicciones = create_train_model_sin_exog(data=data, lags=lags, steps=steps,temporalidad=temporalidad)
-    return predicciones
+    return data, predicciones
 
-prediciciones = predict_sin_exog(db_path='Data/db/btc.db',temporalidad='4H')
-print(prediciciones)
+#prediciciones = predict_sin_exog(db_path='Data/db/btc.db',temporalidad='4H')
+#print(prediciciones)
 # Main script execution
 #print(predict(df_actual="Data/db/btc.db"))
 if __name__ == "__main__":
