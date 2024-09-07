@@ -70,8 +70,8 @@ def createTable_4h(nombre_tabla):
     consulta = f"""
         CREATE TABLE {nombre_tabla} (
             date TEXT,time TEXT,close REAL,open REAL,high REAL,low REAL,volume REAL,
-            var REAL,return REAL,diff REAL,volatility REAL,reward REAL,countdown_halving REAL,
-            rsi_14 REAL,rsi_28 REAL,rsi_14_shifted REAL,rsi_28_shifted REAL,ma_5 REAL,ma_20 REAL,ma_100 REAL,
+            var REAL,return REAL,diff REAL,volatility REAL,rsi_14 REAL,rsi_28 REAL,
+            rsi_14_shifted REAL,rsi_28_shifted REAL,ma_5 REAL,ma_20 REAL,ma_100 REAL,
             MiddleBand REAL,UpperBand REAL,LowerBand REAL,K REAL,D REAL,close_shifted REAL,
             TR REAL,ATR REAL,TP REAL,CCI REAL ,lag1_TR REAL,lag2_TR REAL,
             lag1_ATR REAL,lag2_ATR REAL
@@ -83,10 +83,8 @@ def createTable_4h(nombre_tabla):
 
 # Metodo to_sql
 def insertRows(tabla):
-    """
-    Funcion para insertar valores en la tabla
-    """
     tabla = str(tabla)
+    print(tabla)
     df = pd.read_parquet(f'Data/datasets/{tabla}.parquet',engine='pyarrow') # MODIFICAR NOMBRES
     #df = pd.read_parquet('btc_1d.parquet',engine='pyarrow')
     conn = sql.connect('Data/db/btc.db')
@@ -258,7 +256,7 @@ def actualizarData4h():
         diferencia_minutos = (date_new - date_old).total_seconds() / 60
     df_actual = pd.read_sql_query("SELECT * FROM btc_4h", conn)
     df_actual = funciones.etl_1d_4h(df_actual)
-    df_actual = funciones.calcular_recompensa_y_cuenta_regresiva_df4(df_4h=df_actual)
+    #df_actual = funciones.calcular_recompensa_y_cuenta_regresiva_df4(df_4h=df_actual)
     df_actual.to_sql('btc_4h', conn, if_exists='replace', index=False)
     conn.commit()
     conn.close()
@@ -383,20 +381,20 @@ def cortar_data(df):
 
 if __name__ == "__main__":
     #createDB() # creacion de la base
-    eliminarTabla(tabla='btc_1d')
+    #eliminarTabla(tabla='btc_4h')
     
-    createTable_1d(nombre_tabla='btc_1d')
+    #createTable_1d(nombre_tabla='btc_1d')
     #createTable_4h(nombre_tabla='btc_4h')
     #createTable_1h_5m(nombre_tabla='btc_1h')
     #createTable_1h_5m(nombre_tabla='btc_5m')
     
     #cortar_data('btc_1h')
     
-    insertRows(tabla='btc_1d')
+    #insertRows(tabla='btc_4h')
     #insertMany(lista_tuplas)
     
     #actualizarData1h() #correcta
-    #actualizarData4h() # Correcta
+    actualizarData4h() # Correcta
     #actualizarData1d() # correcta
     #actualizarData5m() # correcta 
 
