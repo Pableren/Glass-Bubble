@@ -161,39 +161,18 @@ def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=No
     forecaster = ForecasterAutoreg(regressor=LGBMRegressor(random_state=42, verbose=-1), lags=lags)
     data.fillna(0,inplace=True)
     data = reordenar_fechas(data,temporalidad=temporalidad)
-    print(data.tail(3))
     data['date'] = pd.to_datetime(data['date'])
-    print(data.tail(3))
-    print(data.dtypes)
-    print(pd.__version__)
-    print(np.__version__)
-    #last_date = pd.to_datetime(data['date'][-1:].values[0])
-    #first_date = pd.to_datetime(data['date'][:1].values[0])
     last_date = data['date'][-1:].values[0]
     first_date = data['date'][:1].values[0]
     inicio_train = first_date
     fin_train = last_date - pd.DateOffset(days=30)
-    print(inicio_train)
-    #last_date = data['date'][-1:].values[0]
-    ##last_date = pd.to_datetime(last_date)
-    #first_date = data['date'][:2].values[0]
-    #first_date_datetime = pd.to_datetime(first_date)
-    #print("first date",first_date_datetime)
-    #inicio_train = first_date_datetime
-    #fin_train = last_date - pd.DateOffset(days=365)
-    #print("inicio_train",inicio_train)
-    #print("inicio_train tipo",type(inicio_train))
-    #print("fin_train",fin_train)
-    #print("fin_train tipo",type(fin_train))
+
     inicio_train = pd.to_datetime(inicio_train)
     formatted_date_inicio = inicio_train.strftime('%Y-%m-%d %H:%M:%S')
     fin_train = pd.to_datetime(fin_train)
     formatted_date_fin = fin_train.strftime('%Y-%m-%d %H:%M:%S')
     # Imprimir las fechas para asegurarse de que sean correctas
-    print("inicio_train:", inicio_train, type(inicio_train))
-    print("fin_train:", fin_train, type(fin_train))
     #print(len(data.loc[inicio_train:fin_train]))
-    print(len(data.loc[formatted_date_inicio:formatted_date_fin]))
     metrica, predicciones = backtesting_forecaster(
         forecaster         = forecaster,
         y                  = data.loc[formatted_date_inicio:, 'close'],
