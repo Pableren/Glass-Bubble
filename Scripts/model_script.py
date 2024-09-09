@@ -133,28 +133,27 @@ def create_and_train_model(data, lags=[1,30,90,180], steps=5):
     predicciones = forecaster.predict(steps=horizonte, exog=df_and_future[exog].iloc[-horizonte:])
     return predicciones
 
+def create_and_train_model(data, lags=[1,30,90,180], steps=5):
+    forecaster = ForecasterAutoreg(regressor=LGBMRegressor(random_state=42, verbose=-1), lags=lags)
+    data.fillna(0,inplace=True)
+    data = reordenar_fechas(data)
+    return None
+
 def reordenar_fechas(data,temporalidad):
     fecha = data['date'][-1:].values[0]
     ultima_fecha = pd.to_datetime(fecha)
     num_instancias = len(data)
     if (temporalidad in ['4h','4H']):
         fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='4H')
-        print("longitud de fechas",len(fechas))
-        print("longitud del indice de df",len(data.index))
-        data['date'] = fechas
-        data.index = fechas
-        print("data reodernar_fechas",data)
     elif (temporalidad in ['1h','1H']):
         fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='1H')
-        print("longitud de fechas",len(fechas))
-        data['date'] = fechas
-        data.index = fechas
     elif (temporalidad in ['5m','5M']):
         fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='5min')
-        print("longitud de fechas",len(fechas))
-        data['date'] = fechas
-        data.index = fechas
-    print("data reodernar_fechas",data)
+    elif (temporalidad in ['1d','1D']):
+        fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='1D')
+    
+    data['date'] = fechas
+    data.index = fechas
     return data
 
 def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=None):
