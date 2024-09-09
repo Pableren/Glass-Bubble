@@ -26,6 +26,10 @@ def entrenar_y_predecir(temporalidad):
     data, predictions = func.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
     return data, predictions
 
+def cortar_data(temporalidad):
+    a = db.cortar_data(temporalidad=temporalidad)
+    return None
+
 # Crear gráfico de valores reales
 def crear_grafico_valores_reales(data, temporalidad):
     fig = go.Figure()
@@ -183,6 +187,8 @@ with col1:
         st.session_state['data'] = data
         st.session_state['predictions'] = None
 
+    if st.button('Recortar datos'):
+        recortar_data = cortar_data(temporalidad=temporalidad_seleccionada)
 
 
 # Mostrar el gráfico en la columna derecha
