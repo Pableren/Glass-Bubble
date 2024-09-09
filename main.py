@@ -176,15 +176,39 @@ with col1:
         elif temporalidad_seleccionada=='5M':
             db.actualizarData5m()
         data = cargar_datos(temporalidad_seleccionada)
-
-# Dentro del bloque con col2:
-with col2:
-    st.subheader(f"Gráfico {temporalidad_seleccionada}")
+    
+    # Botón para entrenar el modelo
     if st.button('Entrenar Modelo'):
         data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
-        st.plotly_chart(crear_grafico_predicciones(data, predictions, temporalidad_seleccionada))
+        # Guardar las predicciones para usarlas en la segunda columna
+        st.session_state['data'] = data
+        st.session_state['predictions'] = predictions
     else:
-        st.plotly_chart(crear_grafico_valores_reales(data, temporalidad_seleccionada))
+        # Guardar los datos reales para usarlos en la segunda columna
+        st.session_state['data'] = data
+        st.session_state['predictions'] = None
+
+
+
+# Mostrar el gráfico en la columna derecha
+with col2:
+    st.subheader(f"Gráfico {temporalidad_seleccionada}")
+    # Verificar si hay predicciones y mostrar el gráfico correspondiente
+    if st.session_state.get('predictions') is not None:
+        st.plotly_chart(crear_grafico_predicciones(st.session_state['data'], st.session_state['predictions'], temporalidad_seleccionada))
+    else:
+        st.plotly_chart(crear_grafico_valores_reales(st.session_state['data'], temporalidad_seleccionada))
+
+
+
+# Dentro del bloque con col2:
+#with col2:
+#    st.subheader(f"Gráfico {temporalidad_seleccionada}")
+#    if st.button('Entrenar Modelo'):
+#        data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
+#        st.plotly_chart(crear_grafico_predicciones(data, predictions, temporalidad_seleccionada))
+#    else:
+#        st.plotly_chart(crear_grafico_valores_reales(data, temporalidad_seleccionada))
 
 # Mostrar tabla de información
 #st.subheader("Panel de Información")
