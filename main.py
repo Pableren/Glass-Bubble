@@ -22,14 +22,9 @@ def cargar_datos(temporalidad):
         return pd.read_sql_query("SELECT * FROM btc_5m", conn)
 
 def entrenar_y_predecir(temporalidad):
-    if temporalidad == '1D':
-        data = func.load_and_prepare_data('Data/db/btc.db')
-        predictions = func.create_and_train_model(data)
-    else:
-        data = func.load_and_prepare_data_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
-        predictions = func.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
-    
-    return data, predictions#
+    data = func.load_and_prepare_data_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
+    predictions = func.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
+    return data, predictions
 
 # Crear gráfico de valores reales
 def crear_grafico_valores_reales(data, temporalidad):
