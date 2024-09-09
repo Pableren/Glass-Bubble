@@ -159,7 +159,6 @@ def reordenar_fechas(data,temporalidad):
 def split_data(data,temporalidad):
     last_date = data['date'][-1:].values[0]
     if (temporalidad in ['4h','4H']):
-        #fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='4H')
         fin_train = last_date - pd.DateOffset(days=30)
     elif (temporalidad in ['1h','1H']):
         fin_train = last_date - pd.DateOffset(days=5)
