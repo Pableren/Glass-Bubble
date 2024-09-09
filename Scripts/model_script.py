@@ -156,6 +156,10 @@ def reordenar_fechas(data,temporalidad):
     data.index = fechas
     return data
 
+def split_data(data,temporalidad):
+    
+    return None
+
 def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=None):
     forecaster = ForecasterAutoreg(regressor=LGBMRegressor(random_state=42, verbose=-1), lags=lags)
     data.fillna(0,inplace=True)
