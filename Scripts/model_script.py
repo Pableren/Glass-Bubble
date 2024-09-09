@@ -157,8 +157,17 @@ def reordenar_fechas(data,temporalidad):
     return data
 
 def split_data(data,temporalidad):
-    
-    return None
+    last_date = data['date'][-1:].values[0]
+    if (temporalidad in ['4h','4H']):
+        #fechas = pd.date_range(end=ultima_fecha, periods=num_instancias,freq='4H')
+        fin_train = last_date - pd.DateOffset(days=30)
+    elif (temporalidad in ['1h','1H']):
+        fin_train = last_date - pd.DateOffset(days=5)
+    elif (temporalidad in ['5m','5M']):
+        fin_train = last_date - pd.DateOffset(minutes=240)
+    elif (temporalidad in ['1d','1D']):
+        fin_train = last_date - pd.DateOffset(days=180)
+    return fin_train
 
 def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=None):
     forecaster = ForecasterAutoreg(regressor=LGBMRegressor(random_state=42, verbose=-1), lags=lags)
@@ -168,8 +177,8 @@ def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=No
     last_date = data['date'][-1:].values[0]
     first_date = data['date'][:1].values[0]
     inicio_train = first_date
-    fin_train = last_date - pd.DateOffset(days=30)
-
+    #fin_train = last_date - pd.DateOffset(days=30)
+    fin_train = split_data(data=data,temporalidad=temporalidad)
     inicio_train = pd.to_datetime(inicio_train)
     formatted_date_inicio = inicio_train.strftime('%Y-%m-%d %H:%M:%S')
     fin_train = pd.to_datetime(fin_train)
