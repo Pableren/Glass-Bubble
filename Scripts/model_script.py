@@ -133,11 +133,11 @@ def create_and_train_model(data, lags=[1,30,90,180], steps=5):
     predicciones = forecaster.predict(steps=horizonte, exog=df_and_future[exog].iloc[-horizonte:])
     return predicciones
 
-def create_and_train_model(data, lags=[1,30,90,180], steps=5):
-    forecaster = ForecasterAutoreg(regressor=LGBMRegressor(random_state=42, verbose=-1), lags=lags)
-    data.fillna(0,inplace=True)
-    data = reordenar_fechas(data)
-    return None
+#def create_and_train_model(data, lags=[1,30,90,180], steps=5):
+#    forecaster = ForecasterAutoreg(regressor=LGBMRegressor(random_state=42, verbose=-1), lags=lags)
+#    data.fillna(0,inplace=True)
+#    data = reordenar_fechas(data)
+#    return None
 
 def reordenar_fechas(data,temporalidad):
     fecha = data['date'][-1:].values[0]
@@ -184,7 +184,7 @@ def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=No
         show_progress      = True
         )
     forecaster.fit(y=data['close'])
-    pred_ultimo_valor = forecaster.predict(steps=5)
+    pred_ultimo_valor = forecaster.predict(steps=steps)
     pred_ultimo_valor = pd.DataFrame(pred_ultimo_valor)
     predicciones_4h = pd.concat(objs=[predicciones,pred_ultimo_valor], axis=0)
     print("predicciones ",predicciones_4h)
