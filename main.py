@@ -22,8 +22,8 @@ def cargar_datos(temporalidad):
         return pd.read_sql_query("SELECT * FROM btc_5m", conn)
 
 def entrenar_y_predecir(temporalidad):
-    data = func.load_and_prepare_data_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
-    predictions = func.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
+    #data = func.load_and_prepare_data_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
+    data, predictions = func.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
     return data, predictions
 
 # Crear gráfico de valores reales
@@ -43,7 +43,7 @@ def crear_grafico_valores_reales(data, temporalidad):
 # Crear gráfico de predicciones
 def crear_grafico_predicciones(data, predictions, temporalidad):
     fig = go.Figure()
-    predicciones = predictions[1]
+    predicciones = predictions
     fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['close'].values[-200:], 
                              mode='lines+markers', name='Valores Reales', marker=dict(color='yellow', symbol='cross')))
     fig.add_trace(go.Scatter(x=predicciones.index, y=predicciones.pred.values, 
