@@ -366,18 +366,23 @@ def actualizarData5m():
     
     
 
-def cortar_data(df):
+def cortar_data(temporalidad):
     """
     Funcion para almacenar los ultimos datos del bitcoin
     """
-    df_name = str(df)
+    table_name = 'btc'+'_'+temporalidad.lower()
     conn = sql.connect('Data/db/btc.db')
-    df_actual = pd.read_sql_query(f"SELECT * FROM {df_name}",conn)
-    total_data = 17000
+    #if (temporalidad in ['1D','1d']):
+    #    df_actual = pd.read_sql_query(f"SELECT * FROM {table_name}",conn)
+    #elif (temporalidad in ['4H','4h']):
+    #    df_actual = pd.read_sql_query(f"SELECT * FROM {table_name}",conn)
+    df_actual = pd.read_sql_query(f"SELECT * FROM {table_name}",conn)
+    total_data = 15000
     df_actual = df_actual[-total_data:]
-    df_actual.to_sql(f'{df_name}',conn, if_exists='replace',index=False)
+    df_actual.to_sql(f'{table_name}',conn, if_exists='replace',index=False)
     conn.commit()
     conn.close()
+    return None
 
 if __name__ == "__main__":
     #createDB() # creacion de la base
