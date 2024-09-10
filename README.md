@@ -85,6 +85,50 @@ Detalla la arquitectura: ¿Cómo se conectan los diferentes componentes del tabl
 - Alta precisión: LightGBM es un algoritmo de boosting muy eficiente y preciso, lo que lo convierte en una excelente opción para modelos de predicción de series de tiempo.
 - Flexibilidad: Permite la creación de modelos complejos que combinan múltiples características y técnicas de modelado.
 
+
+### Variables Sinteticas: Panel de informacion
+
+#### 1. Promedio Móvil (Moving Average, MA)
+* **Concepto:** Es un indicador que suaviza los datos de precios al calcular el promedio del precio de cierre durante un período específico.
+* **Tipos:**
+  * **Corto plazo:** Refleja tendencias más recientes del precio.
+  * **Largo plazo:** Muestra la tendencia general del precio a largo plazo.
+* **Uso:** Se utiliza para identificar tendencias alcistas (precio por encima del MA) o bajistas (precio por debajo del MA).
+
+#### 2. MACD (Moving Average Convergence Divergence)
+* **Concepto:** Mide la relación entre dos promedios móviles para generar una señal de compra o venta.
+* **Componentes:**
+  * **Línea MACD:** Diferencia entre dos promedios móviles (generalmente 12 y 26 períodos).
+  * **Señal MACD:** Promedio móvil de la línea MACD (generalmente 9 períodos).
+  * **Histograma MACD:** Diferencia entre la línea MACD y la señal MACD.
+* **Uso:** Señales de compra cuando la línea MACD cruza por encima de la señal MACD y de venta cuando ocurre lo contrario. El histograma refuerza estas señales.
+
+#### 3. Bandas de Bollinger
+* **Concepto:** Miden la volatilidad del precio en relación a un promedio móvil.
+* **Componentes:**
+  * **Media móvil:** Promedio del precio de cierre durante un período específico.
+  * **Banda superior:** Media móvil más dos desviaciones estándar.
+  * **Banda inferior:** Media móvil menos dos desviaciones estándar.
+* **Uso:** Cuando el precio toca las bandas, puede indicar sobrecompra (banda superior) o sobreventa (banda inferior).
+
+#### 4. Oscilador Estocástico
+* **Concepto:** Mide el precio de cierre en relación al rango de precios de un período determinado.
+* **Componentes:**
+  * **%K:** Porcentaje que indica la posición del precio de cierre en relación al rango de precios.
+  * **%D:** Promedio móvil del %K.
+* **Uso:** Señales de sobrecompra cuando %K y %D están por encima de un nivel determinado (generalmente 80) y de sobreventa cuando están por debajo de otro nivel (generalmente 20).
+
+#### 5. Índice de Fuerza Relativa (RSI)
+* **Concepto:** Mide la velocidad y el cambio de los precios.
+* **Uso:** Señales de sobrecompra cuando el RSI está por encima de un nivel determinado (generalmente 70) y de sobreventa cuando está por debajo de otro nivel (generalmente 30).
+
+
+#### 6. Índice de Canal de Materias Primas (CCI)
+* **Concepto:** Mide la desviación del precio en relación a un promedio móvil.
+* **Uso:** Señales de sobrecompra cuando el CCI está por encima de un nivel determinado (generalmente 100) y de sobreventa cuando está por debajo de otro nivel (generalmente -100).
+
+**Nota:** Estos indicadores son herramientas de análisis técnico y no garantizan resultados futuros. Es importante utilizarlos en combinación con otros análisis y considerar el contexto del mercado.
+
 ## Upgrades:
 
 - Posible mejora, al integrar todos los pasos las extracciones y la generacion de la base de datos, en un mismo archivo.py.
