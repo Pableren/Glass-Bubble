@@ -212,19 +212,7 @@ def etl_1h_5m(df):
     df['diff'] = df['close'] - df['open']
     df['volatility'] = df['high'] - df['low']
     window_14 = 14
-    window_28 = 28
-    df['rsi_14'] = ta.momentum.RSIIndicator(close=df['close'],window=window_14).rsi()
-    df['rsi_28'] = ta.momentum.RSIIndicator(close=df['close'],window=window_28).rsi()
-    shift_periods = 7  # Puedes cambiar esto al número de periodos que desees
-    df['rsi_14_shifted'] = df['rsi_14'].shift(+shift_periods)
-    shift_periods = 14
-    df['rsi_28_shifted'] = df['rsi_28'].shift(+shift_periods)
-    df['rsi_14'] = ta.momentum.RSIIndicator(close=df['close'],window=window_14).rsi()
-    df['rsi_28'] = ta.momentum.RSIIndicator(close=df['close'],window=window_28).rsi()
-    shift_periods = 7  # Puedes cambiar esto al número de periodos que desees
-    df['rsi_14_shifted'] = df['rsi_14'].shift(+shift_periods)
-    shift_periods = 14
-    df['rsi_28_shifted'] = df['rsi_28'].shift(+shift_periods)
+    df['rsi'] = ta.momentum.RSIIndicator(close=df['close'],window=window_14).rsi()
     df['ma_5'] = df['close'].rolling(window=5).mean()
     df['ma_20'] = df['close'].rolling(window=20).mean()
     df['ma_100'] = df['close'].rolling(window=100).mean()
@@ -237,23 +225,9 @@ def etl_1h_5m(df):
     #Oscilador Estocástico
     df['K'] = 100 * ((df['close'] - df['low'].rolling(window=14).min()) / (df['high'].rolling(window=14).max() - df['low'].rolling(window=14).min()))
     df['D'] = df['K'].rolling(window=3).mean()
-
-    #True Range (TR) y Average True Range (ATR)
-    df['close_shifted'] = df['close'].shift(1)
-    df['TR'] = df[['high', 'low', 'close_shifted']].apply(
-        lambda row: max(row['high'] - row['low'], 
-                        abs(row['high'] - row['close_shifted']), 
-                        abs(row['low'] - row['close_shifted'])), axis=1)
-    df['ATR'] = df['TR'].rolling(window=14).mean()
-
     #Índice de Canal de Materias Primas (CCI)
     df['TP'] = (df['high'] + df['low'] + df['close']) / 3
     df['CCI'] = (df['TP'] - df['TP'].rolling(window=20).mean()) / (0.015 * df['TP'].rolling(window=20).std())    
-    
-    df['lag1_TR'] = df['TR'].shift(45)
-    df['lag2_TR'] = df['TR'].shift(90)
-    df['lag1_ATR'] = df['ATR'].shift(45)
-    df['lag2_ATR'] = df['ATR'].shift(90)
     
     last_timestamp = df['time'].iloc[-1]
     last_timestamp = float(last_timestamp)
@@ -268,47 +242,21 @@ def etl_1d_4h(df):
     df['diff'] = df['close'] - df['open']
     df['volatility'] = df['high'] - df['low']
     window_14 = 14
-    window_28 = 28
-    df['rsi_14'] = ta.momentum.RSIIndicator(close=df['close'],window=window_14).rsi()
-    df['rsi_28'] = ta.momentum.RSIIndicator(close=df['close'],window=window_28).rsi()
-    shift_periods = 7  # Puedes cambiar esto al número de periodos que desees
-    df['rsi_14_shifted'] = df['rsi_14'].shift(+shift_periods)
-    shift_periods = 14
-    df['rsi_28_shifted'] = df['rsi_28'].shift(+shift_periods)
-    df['rsi_14'] = ta.momentum.RSIIndicator(close=df['close'],window=window_14).rsi()
-    df['rsi_28'] = ta.momentum.RSIIndicator(close=df['close'],window=window_28).rsi()
-    shift_periods = 7  # Puedes cambiar esto al número de periodos que desees
-    df['rsi_14_shifted'] = df['rsi_14'].shift(+shift_periods)
-    shift_periods = 14
-    df['rsi_28_shifted'] = df['rsi_28'].shift(+shift_periods)
+    df['rsi'] = ta.momentum.RSIIndicator(close=df['close'],window=window_14).rsi()
     df['ma_5'] = df['close'].rolling(window=5).mean()
     df['ma_20'] = df['close'].rolling(window=20).mean()
     df['ma_100'] = df['close'].rolling(window=100).mean()
-
     # Bandas de Bollinger solo se usara para graficar
     df['MiddleBand'] = df['close'].rolling(window=20).mean()
     df['UpperBand'] = df['MiddleBand'] + 2*df['close'].rolling(window=20).std()
     df['LowerBand'] = df['MiddleBand'] - 2*df['close'].rolling(window=20).std()
-
     #Oscilador Estocástico
     df['K'] = 100 * ((df['close'] - df['low'].rolling(window=14).min()) / (df['high'].rolling(window=14).max() - df['low'].rolling(window=14).min()))
     df['D'] = df['K'].rolling(window=3).mean()
 
-    #True Range (TR) y Average True Range (ATR)
-    df['close_shifted'] = df['close'].shift(1)
-    df['TR'] = df[['high', 'low', 'close_shifted']].apply(
-        lambda row: max(row['high'] - row['low'], 
-                        abs(row['high'] - row['close_shifted']), 
-                        abs(row['low'] - row['close_shifted'])), axis=1)
-    df['ATR'] = df['TR'].rolling(window=14).mean()
-
     #Índice de Canal de Materias Primas (CCI)
     df['TP'] = (df['high'] + df['low'] + df['close']) / 3
     df['CCI'] = (df['TP'] - df['TP'].rolling(window=20).mean()) / (0.015 * df['TP'].rolling(window=20).std())
-    df['lag1_TR'] = df['TR'].shift(45)
-    df['lag2_TR'] = df['TR'].shift(90)
-    df['lag1_ATR'] = df['ATR'].shift(45)
-    df['lag2_ATR'] = df['ATR'].shift(90)
     df['date'] = pd.to_datetime(df['time'], unit='ms')
     #df['date'] = pd.to_datetime(df['time'], unit='ms').dt.normalize()
     df['date'] = df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')
