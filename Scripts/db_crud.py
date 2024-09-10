@@ -51,72 +51,6 @@ def tables_drop(table_list=['btc_1d','btc_4h','btc_1h','btc_5m']):
         eliminarTabla(tabla=x)
     return None
 
-#def createTable_1h_5m(nombre_tabla):
-#    conn = sql.connect('Data/db/btc.db')
-#    cursor = conn.cursor()
-#    nombre_tabla = str(nombre_tabla)
-#    consulta = f"""
-#        CREATE TABLE {nombre_tabla} (
-#            date TEXT,
-#            time TEXT,
-#            open REAL,
-#            high REAL,
-#            low REAL,
-#            close REAL,
-#            volume REAL,
-#            return REAL,
-#            diff REAL,
-#            volatility REAL,
-#            rsi_14 REAL,rsi_28 REAL,rsi_14_shifted REAL,rsi_28_shifted REAL,
-#            ma_5 REAL,ma_20 REAL,ma_100 REAL,
-#            MiddleBand REAL, UpperBand REAL, LowerBand REAL,
-#            K REAL, D REAL, close_shifted REAL, TR REAL, ATR REAL, TP REAL, CCI REAL,
-#            lag1_TR REAL,lag2_TR REAL,
-#            lag1_ATR REAL,lag2_ATR REAL
-#        )
-#        """
-#    cursor.execute(consulta)
-#    conn.commit()
-#    conn.close()
-#
-#def createTable_1d(nombre_tabla):
-#    conn = sql.connect('Data/db/btc.db')
-#    cursor = conn.cursor()
-#    nombre_tabla = str(nombre_tabla)
-#    consulta = f"""
-#        CREATE TABLE {nombre_tabla} (
-#            date TEXT,time TEXT,close REAL,open REAL,high REAL,low REAL,volume REAL,
-#            var REAL,return REAL,diff REAL,volatility REAL,reward REAL,countdown_halving REAL,
-#            rsi_14 REAL,rsi_28 REAL,rsi_14_shifted REAL,rsi_28_shifted REAL,ma_5 REAL,ma_20 REAL,ma_100 REAL,
-#            MiddleBand REAL,UpperBand REAL,LowerBand REAL,K REAL,D REAL,
-#            close_shifted REAL,TR REAL,ATR REAL,TP REAL,CCI REAL, lag1_TR REAL,lag2_TR REAL,
-#            lag1_ATR REAL,lag2_ATR REAL
-#        )
-#        """
-#    cursor.execute(consulta)
-#    conn.commit()
-#    conn.close()
-#
-#
-#def createTable_4h(nombre_tabla):
-#    conn = sql.connect('Data/db/btc.db')
-#    cursor = conn.cursor()
-#    nombre_tabla = str(nombre_tabla)
-#    consulta = f"""
-#        CREATE TABLE {nombre_tabla} (
-#            date TEXT,time TEXT,close REAL,open REAL,high REAL,low REAL,volume REAL,
-#            var REAL,return REAL,diff REAL,volatility REAL,rsi_14 REAL,rsi_28 REAL,
-#            rsi_14_shifted REAL,rsi_28_shifted REAL,ma_5 REAL,ma_20 REAL,ma_100 REAL,
-#            MiddleBand REAL,UpperBand REAL,LowerBand REAL,K REAL,D REAL,close_shifted REAL,
-#            TR REAL,ATR REAL,TP REAL,CCI REAL ,lag1_TR REAL,lag2_TR REAL,
-#            lag1_ATR REAL,lag2_ATR REAL
-#        )
-#        """
-#    cursor.execute(consulta)
-#    conn.commit()
-#    conn.close()
-#
-
 # Metodo to_sql
 def insertRows(tabla):
     tabla = str(tabla)
@@ -134,28 +68,6 @@ def tables_fill(table_list=['btc_1d','btc_4h','btc_1h','btc_5m']):
         insertRows(tabla=x)
     return None
 
-# Metodo ExecuteMany
-def insertMany(btc_list):
-    conn = sql.connect('Data/db/btc.db')
-    cursor = conn.cursor()
-    instruccion = f"INSERT INTO btc_5m VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-    cursor.executemany(instruccion,btc_list)
-    # Metodo alternativo donde no es necesario usar executemany
-    #cursor = conexion.cursor()
-    #for index, row in df.iterrows():
-    #    cursor.execute(instruccion, (row['time'], row['open'],
-    #                                 row['high'], row['low'],
-    #                                 row['close'], row['volume'],
-    #                                 row['return'], row['diff'],
-    #                                 row['volatility'],row['SMA_5'],
-    #                                 row['SMA_10'],row['SMA_50'],
-    #                                 row['SMA_100'], row['date']))
-    conn.commit()
-    conn.close()
-# dejar en este nivel de identacion o introducir dentro de insertMany()
-#df = pd.read_parquet('btc_1d.parquet',engine='pyarrow')
-#df['date'] = df['date'].dt.strftime('%Y/%m/%d')
-#lista_tuplas = [tuple(row) for row in df.values]
 
 
     
@@ -198,7 +110,6 @@ def actualizarData1h():
         date_old = datetime(1970, 1, 1)
     else:
         date_old = datetime.strptime(fila[0],"%Y-%m-%d %H:%M:%S")
-    print("fecha mas vieja:",date_old)
     date_new = datetime.now().replace(microsecond=0)# Obtener la fecha y hora actual
     diferencia_minutos = (date_new - date_old).total_seconds() / 60
     fifteen_dats_ms = 15*24 * 60 *60 * 1000
@@ -209,7 +120,6 @@ def actualizarData1h():
     while diferencia_minutos > 60:
         datos_1h = fetch_ohlcv_data(exchange, 'BTC/USDT', '1h', since=since, limit=360)
         if datos_1h.empty:
-            print("sin valores en la llamada")
             conn.close()
             return
         #mi valores de head, se concatenan con mis ultimos valores de la base
@@ -229,10 +139,8 @@ def actualizarData1h():
             cursor.execute("""SELECT * FROM btc_1h ORDER BY time DESC LIMIT 1;""")
             fila = cursor.fetchone()
             date_old = datetime.strptime(fila[0],"%Y-%m-%d %H:%M:%S")
-            print("date_old:",date_old)
             diferencia_minutos = (date_new-date_old).total_seconds()/60
         else:
-            print("No hay valores faltantes.")
             break
         since += fifteen_dats_ms
         #since = int(date_old.timestamp() * 1000)
@@ -313,13 +221,11 @@ def actualizarData1d():
     diferencia_minutos = (date_new - date_old).total_seconds() / 60
     one_year = 365 *24 * 60 *60 * 1000
     since = int(date_old.timestamp() * 1000)
-    print("since: ",since)
     while diferencia_minutos > 1440:
         datos_1d = fetch_ohlcv_data(exchange, 'BTC/USDT', '1d', since=since, limit=365)
         if datos_1d.empty:
             conn.close()
             return
-        print("datos_1d despues de extraer:",datos_1d.tail(5))
         datos_1d = funciones.etl_1d_4h(datos_1d)
         df_actual = pd.read_sql_query("SELECT * FROM btc_1d", conn)
         datos_faltantes = datos_1d[~datos_1d['time'].isin(df_actual['time'])]
@@ -327,7 +233,6 @@ def actualizarData1d():
         if not datos_faltantes.empty:
             cursor.execute("""SELECT COUNT(*) FROM btc_1d;""")
             cantidad_registros_ingresados_viejos = cursor.fetchone()[0]
-            print("shape datos_faltantes",datos_faltantes.shape)
             datos_faltantes.to_sql('btc_1d', conn, if_exists='append', index=False)
             conn.commit()
             cursor.execute("""SELECT COUNT(*) FROM btc_1d;""")
@@ -405,10 +310,6 @@ def cortar_data(temporalidad):
     """
     table_name = 'btc'+'_'+temporalidad.lower()
     conn = sql.connect('Data/db/btc.db')
-    #if (temporalidad in ['1D','1d']):
-    #    df_actual = pd.read_sql_query(f"SELECT * FROM {table_name}",conn)
-    #elif (temporalidad in ['4H','4h']):
-    #    df_actual = pd.read_sql_query(f"SELECT * FROM {table_name}",conn)
     df_actual = pd.read_sql_query(f"SELECT * FROM {table_name}",conn)
     total_data = 15000
     df_actual = df_actual[-total_data:]
