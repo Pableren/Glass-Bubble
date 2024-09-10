@@ -93,10 +93,9 @@ def load_and_prepare_data(db_path):
     df_1d = pd.read_sql_query("SELECT * FROM btc_1d", conn)
     conn.close()
     df_1d.drop(columns=[
-        'open', 'high', 'low', 'volume', 'var', 'return', 'diff', 'volatility', 
-        'rsi_14', 'rsi_28', 'rsi_14_shifted', 'rsi_28_shifted', 'ma_5', 'ma_20', 
-        'ma_100', 'MiddleBand', 'UpperBand', 'LowerBand', 'K', 'D', 'close_shifted', 
-        'TR', 'ATR', 'TP', 'CCI', 'lag1_TR', 'lag2_TR', 'lag1_ATR', 'lag2_ATR'], inplace=True)
+        'open', 'high', 'low', 'volume', 'return', 'diff', 'volatility', 
+        'rsi', 'ma_5', 'ma_20', 'ma_100', 'MiddleBand', 'UpperBand', 'LowerBand', 'K', 'D', 
+         'TP', 'CCI'], inplace=True)
     fecha = df_1d['date'][-1:].values[0]
     ultima_fecha = pd.to_datetime(fecha)
     num_dias = len(df_1d)
@@ -111,10 +110,10 @@ def load_and_prepare_data_sin_exog(db_path,temporalidad):
     conn = sql.connect(db_path)
     data = pd.read_sql_query(f"SELECT * FROM btc_{temporalidad}", conn)
     conn.close()
-    data.drop(columns=['open', 'high', 'low', 'volume', 'return', 'diff', 'volatility', 
-        'rsi_14', 'rsi_28', 'rsi_14_shifted', 'rsi_28_shifted', 'ma_5', 'ma_20', 
-        'ma_100', 'MiddleBand', 'UpperBand', 'LowerBand', 'K', 'D', 'close_shifted', 
-        'TR', 'ATR', 'TP', 'CCI', 'lag1_TR', 'lag2_TR', 'lag1_ATR', 'lag2_ATR'], inplace=True)
+    data.drop(columns=[
+        'open', 'high', 'low', 'volume', 'return', 'diff', 'volatility', 
+        'rsi', 'ma_5', 'ma_20', 'ma_100', 'MiddleBand', 'UpperBand', 'LowerBand', 'K', 'D', 
+         'TP', 'CCI'], inplace=True)
     return data
 
 # Function to create and train the model
@@ -219,10 +218,6 @@ def predict_sin_exog(db_path, lags=[1,30,90,180], steps=5,temporalidad=None):
     predicciones = create_train_model_sin_exog(data=data, lags=lags, steps=steps,temporalidad=temporalidad)
     return data, predicciones
 
-#prediciciones = predict_sin_exog(db_path='Data/db/btc.db',temporalidad='4H')
-#print(prediciciones)
-# Main script execution
-#print(predict(df_actual="Data/db/btc.db"))
 if __name__ == "__main__":
     pass
     #data= load_and_prepare_data('Data/db/btc.db')
