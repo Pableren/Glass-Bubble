@@ -15,83 +15,124 @@ def createDB():
     conn = sql.connect('Data/db/btc.db') # objeeto de la clase coneccion
     conn.commit()
     conn.close()
-
-def createTable_1h_5m(nombre_tabla):
+    
+def eliminarTabla(tabla):
     conn = sql.connect('Data/db/btc.db')
     cursor = conn.cursor()
-    nombre_tabla = str(nombre_tabla)
+    tabla = str(tabla)
+    consulta = f"DROP TABLE {tabla};"
+    cursor.execute(consulta)
+    conn.commit()
+    conn.close()
+    
+def crear_tabla(table_name):
+    conn = sql.connect('Data/db/btc.db')
+    cursor = conn.cursor()
     consulta = f"""
-        CREATE TABLE {nombre_tabla} (
-            date TEXT,
-            time TEXT,
-            open REAL,
-            high REAL,
-            low REAL,
-            close REAL,
-            volume REAL,
-            return REAL,
-            diff REAL,
-            volatility REAL,
-            rsi_14 REAL,rsi_28 REAL,rsi_14_shifted REAL,rsi_28_shifted REAL,
-            ma_5 REAL,ma_20 REAL,ma_100 REAL,
+        CREATE TABLE {table_name} (
+            date TEXT,time TEXT,open REAL,high REAL,low REAL,close REAL,volume REAL,
+            return REAL,diff REAL,volatility REAL,rsi REAL,ma_5 REAL,ma_20 REAL,ma_100 REAL,
             MiddleBand REAL, UpperBand REAL, LowerBand REAL,
-            K REAL, D REAL, close_shifted REAL, TR REAL, ATR REAL, TP REAL, CCI REAL,
-            lag1_TR REAL,lag2_TR REAL,
-            lag1_ATR REAL,lag2_ATR REAL
+            K REAL, D REAL, TP REAL, CCI REAL
         )
         """
     cursor.execute(consulta)
     conn.commit()
     conn.close()
+    return None
 
-def createTable_1d(nombre_tabla):
-    conn = sql.connect('Data/db/btc.db')
-    cursor = conn.cursor()
-    nombre_tabla = str(nombre_tabla)
-    consulta = f"""
-        CREATE TABLE {nombre_tabla} (
-            date TEXT,time TEXT,close REAL,open REAL,high REAL,low REAL,volume REAL,
-            var REAL,return REAL,diff REAL,volatility REAL,reward REAL,countdown_halving REAL,
-            rsi_14 REAL,rsi_28 REAL,rsi_14_shifted REAL,rsi_28_shifted REAL,ma_5 REAL,ma_20 REAL,ma_100 REAL,
-            MiddleBand REAL,UpperBand REAL,LowerBand REAL,K REAL,D REAL,
-            close_shifted REAL,TR REAL,ATR REAL,TP REAL,CCI REAL, lag1_TR REAL,lag2_TR REAL,
-            lag1_ATR REAL,lag2_ATR REAL
-        )
-        """
-    cursor.execute(consulta)
-    conn.commit()
-    conn.close()
+def tables_create(table_list=['btc_1d','btc_4h','btc_1h','btc_5m']):
+    for x in table_list:
+        crear_tabla(x)
+    return None
 
+def tables_drop(table_list=['btc_1d','btc_4h','btc_1h','btc_5m']):
+    for x in table_list:
+        eliminarTabla(tabla=x)
+    return None
 
-def createTable_4h(nombre_tabla):
-    conn = sql.connect('Data/db/btc.db')
-    cursor = conn.cursor()
-    nombre_tabla = str(nombre_tabla)
-    consulta = f"""
-        CREATE TABLE {nombre_tabla} (
-            date TEXT,time TEXT,close REAL,open REAL,high REAL,low REAL,volume REAL,
-            var REAL,return REAL,diff REAL,volatility REAL,rsi_14 REAL,rsi_28 REAL,
-            rsi_14_shifted REAL,rsi_28_shifted REAL,ma_5 REAL,ma_20 REAL,ma_100 REAL,
-            MiddleBand REAL,UpperBand REAL,LowerBand REAL,K REAL,D REAL,close_shifted REAL,
-            TR REAL,ATR REAL,TP REAL,CCI REAL ,lag1_TR REAL,lag2_TR REAL,
-            lag1_ATR REAL,lag2_ATR REAL
-        )
-        """
-    cursor.execute(consulta)
-    conn.commit()
-    conn.close()
+#def createTable_1h_5m(nombre_tabla):
+#    conn = sql.connect('Data/db/btc.db')
+#    cursor = conn.cursor()
+#    nombre_tabla = str(nombre_tabla)
+#    consulta = f"""
+#        CREATE TABLE {nombre_tabla} (
+#            date TEXT,
+#            time TEXT,
+#            open REAL,
+#            high REAL,
+#            low REAL,
+#            close REAL,
+#            volume REAL,
+#            return REAL,
+#            diff REAL,
+#            volatility REAL,
+#            rsi_14 REAL,rsi_28 REAL,rsi_14_shifted REAL,rsi_28_shifted REAL,
+#            ma_5 REAL,ma_20 REAL,ma_100 REAL,
+#            MiddleBand REAL, UpperBand REAL, LowerBand REAL,
+#            K REAL, D REAL, close_shifted REAL, TR REAL, ATR REAL, TP REAL, CCI REAL,
+#            lag1_TR REAL,lag2_TR REAL,
+#            lag1_ATR REAL,lag2_ATR REAL
+#        )
+#        """
+#    cursor.execute(consulta)
+#    conn.commit()
+#    conn.close()
+#
+#def createTable_1d(nombre_tabla):
+#    conn = sql.connect('Data/db/btc.db')
+#    cursor = conn.cursor()
+#    nombre_tabla = str(nombre_tabla)
+#    consulta = f"""
+#        CREATE TABLE {nombre_tabla} (
+#            date TEXT,time TEXT,close REAL,open REAL,high REAL,low REAL,volume REAL,
+#            var REAL,return REAL,diff REAL,volatility REAL,reward REAL,countdown_halving REAL,
+#            rsi_14 REAL,rsi_28 REAL,rsi_14_shifted REAL,rsi_28_shifted REAL,ma_5 REAL,ma_20 REAL,ma_100 REAL,
+#            MiddleBand REAL,UpperBand REAL,LowerBand REAL,K REAL,D REAL,
+#            close_shifted REAL,TR REAL,ATR REAL,TP REAL,CCI REAL, lag1_TR REAL,lag2_TR REAL,
+#            lag1_ATR REAL,lag2_ATR REAL
+#        )
+#        """
+#    cursor.execute(consulta)
+#    conn.commit()
+#    conn.close()
+#
+#
+#def createTable_4h(nombre_tabla):
+#    conn = sql.connect('Data/db/btc.db')
+#    cursor = conn.cursor()
+#    nombre_tabla = str(nombre_tabla)
+#    consulta = f"""
+#        CREATE TABLE {nombre_tabla} (
+#            date TEXT,time TEXT,close REAL,open REAL,high REAL,low REAL,volume REAL,
+#            var REAL,return REAL,diff REAL,volatility REAL,rsi_14 REAL,rsi_28 REAL,
+#            rsi_14_shifted REAL,rsi_28_shifted REAL,ma_5 REAL,ma_20 REAL,ma_100 REAL,
+#            MiddleBand REAL,UpperBand REAL,LowerBand REAL,K REAL,D REAL,close_shifted REAL,
+#            TR REAL,ATR REAL,TP REAL,CCI REAL ,lag1_TR REAL,lag2_TR REAL,
+#            lag1_ATR REAL,lag2_ATR REAL
+#        )
+#        """
+#    cursor.execute(consulta)
+#    conn.commit()
+#    conn.close()
+#
 
 # Metodo to_sql
 def insertRows(tabla):
     tabla = str(tabla)
-    print(tabla)
     df = pd.read_parquet(f'Data/datasets/{tabla}.parquet',engine='pyarrow') # MODIFICAR NOMBRES
     #df = pd.read_parquet('btc_1d.parquet',engine='pyarrow')
+    print(df)
     conn = sql.connect('Data/db/btc.db')
     df.to_sql(f'{tabla}', conn, if_exists='append', index=False)
     #df.to_sql('btc_1d', conn, if_exists='append', index=False)
     conn.commit()
     conn.close()
+
+def tables_fill(table_list=['btc_1d','btc_4h','btc_1h','btc_5m']):
+    for x in table_list:
+        insertRows(tabla=x)
+    return None
 
 # Metodo ExecuteMany
 def insertMany(btc_list):
@@ -116,15 +157,7 @@ def insertMany(btc_list):
 #df['date'] = df['date'].dt.strftime('%Y/%m/%d')
 #lista_tuplas = [tuple(row) for row in df.values]
 
-def eliminarTabla(tabla):
-    conn = sql.connect('Data/db/btc.db')
-    cursor = conn.cursor()
-    tabla = str(tabla)
-    consulta = f"DROP TABLE {tabla};"
-    cursor.execute(consulta)
-    conn.commit()
-    conn.close()
-    
+
     
 def lecturaUltimoElemento():
     conn = sql.connect('Data/db/btc.db')
@@ -385,24 +418,15 @@ def cortar_data(temporalidad):
     return None
 
 if __name__ == "__main__":
-    #createDB() # creacion de la base
-    #eliminarTabla(tabla='btc_4h')
-    
-    #createTable_1d(nombre_tabla='btc_1d')
-    #createTable_4h(nombre_tabla='btc_4h')
-    #createTable_1h_5m(nombre_tabla='btc_1h')
-    #createTable_1h_5m(nombre_tabla='btc_5m')
-    
-    #cortar_data('btc_1h')
-    
-    #insertRows(tabla='btc_4h')
-    #insertMany(lista_tuplas)
-    
+    #tables_drop()
+    #tables_create()
+    #tables_fill()
+
     #actualizarData1h() #correcta
-    actualizarData4h() # Correcta
+    #actualizarData4h() # Correcta
     #actualizarData1d() # correcta
     #actualizarData5m() # correcta 
-
+    pass
 
 """
 
