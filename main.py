@@ -97,7 +97,6 @@ def create_info_table(volume, volatility):
         "Valor": [volume, volatility]
     })
 
-#115f8f
 
 # Función para generar la tabla con estilos en HTML
 def create_info_table_with_style(volume, volatility):
@@ -121,15 +120,8 @@ def create_info_table_with_style(volume, volatility):
     return html
 
 
-#temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades)
-
 # Crear columnas: la primera columna será el panel de información y la segunda columna los gráficos
 col1, col2 = st.columns([1, 3])  # Ajusta las proporciones de ancho
-
-# Cargar los datos según la temporalidad seleccionada
-#data = cargar_datos(temporalidad_seleccionada)
-
-#info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
 
 # Mostrar el panel de información en la columna izquierda
 with col1:
