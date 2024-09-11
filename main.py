@@ -27,7 +27,7 @@ def entrenar_y_predecir(temporalidad):
     return data, predictions
 
 def cortar_data(temporalidad):
-    a = db.cortar_data(temporalidad=temporalidad)
+    db.cortar_data(temporalidad=temporalidad)
     return None
 
 # Crear gráfico de valores reales
@@ -100,25 +100,30 @@ def create_info_table(volume, volatility):
 
 
 
-temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades)
+#temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades)
 
 # Crear columnas: la primera columna será el panel de información y la segunda columna los gráficos
 col1, col2 = st.columns([1, 3])  # Ajusta las proporciones de ancho
 
 # Cargar los datos según la temporalidad seleccionada
-data = cargar_datos(temporalidad_seleccionada)
+#data = cargar_datos(temporalidad_seleccionada)
 
-info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
-
+#info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
 
 # Mostrar el panel de información en la columna izquierda
 with col1:
+    #temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades)
+    temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades, index=0)
     st.subheader("Panel de Información")
-    info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
-    st.table(info_panel_table)  # Mostrar tabla
-    
+    #info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
+    #st.table(info_panel_table)  # Mostrar tabla
+    data = cargar_datos(temporalidad_seleccionada)
     # Colocar botones debajo del panel de información
     if st.button('Actualizar Datos'):
+        data = cargar_datos(temporalidad_seleccionada)
+        if data is not None:
+            info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
+            st.table(info_panel_table)  # Mostrar tabla con datos actualizados
         if temporalidad_seleccionada=='1D':
             db.actualizarData1d()
         elif temporalidad_seleccionada=='4H':
