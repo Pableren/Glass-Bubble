@@ -83,7 +83,7 @@ def estilo_porcentuales(value, lim_inf=20, lim_sup=80):
     else:
         return "background-color: grey; color: black;"
 
-def get_cell_style(value, threshold=35000):
+def get_cell_style(value, threshold=30000):
     if value > threshold:
         return "background-color: green; color: white;"
     elif value < threshold:
@@ -97,7 +97,28 @@ def create_info_table(volume, volatility):
         "Valor": [volume, volatility]
     })
 
+#115f8f
 
+# Función para generar la tabla con estilos en HTML
+def create_info_table_with_style(volume, volatility):
+    # Crear la tabla en HTML
+    html = f"""
+    <table style="width:100%; border-collapse: collapse; background-color: #397cc4;">
+        <tr>
+            <th style="border: 1px solid black; padding: 3px;">Variable</th>
+            <th style="border: 1px solid black; padding: 3px;">Valor</th>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; padding: 3px;">Volumen</td>
+            <td style="border: 1px solid black; padding: 3px; {get_cell_style(volume)}">{volume}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; padding: 3px;">Volatilidad</td>
+            <td style="border: 1px solid black; padding: 3px; {estilo_porcentuales(volatility)}">{volatility}</td>
+        </tr>
+    </table>
+    """
+    return html
 
 
 #temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades)
@@ -118,12 +139,23 @@ with col1:
     #info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
     #st.table(info_panel_table)  # Mostrar tabla
     data = cargar_datos(temporalidad_seleccionada)
-    # Colocar botones debajo del panel de información
+    if data is not None:
+        #info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
+        #st.table(info_panel_table)  # Mostrar tabla con los datos cargados
+        
+        volume = data['volume'].iloc[-1]
+        volatility = data['volatility'].iloc[-1]
+        # Generar la tabla con estilo y mostrarla con HTML
+        styled_table = create_info_table_with_style(volume, volatility)
+        st.markdown(styled_table, unsafe_allow_html=True)
+        
+        
+    
     if st.button('Actualizar Datos'):
         data = cargar_datos(temporalidad_seleccionada)
-        if data is not None:
-            info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
-            st.table(info_panel_table)  # Mostrar tabla con datos actualizados
+        #if data is not None:
+        #    info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
+        #    st.table(info_panel_table)  # Mostrar tabla con datos actualizados
         if temporalidad_seleccionada=='1D':
             db.actualizarData1d()
         elif temporalidad_seleccionada=='4H':
