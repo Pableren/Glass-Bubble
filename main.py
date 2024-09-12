@@ -61,7 +61,29 @@ def crear_grafico_predicciones(data, predictions, temporalidad):
         template='plotly_white'
     )
     return fig
+import base64  # Para codificar la imagen a base64
 st.set_page_config(layout="wide")  # Esto asegura que el ancho completo se use
+# Definir la función para agregar el fondo
+def set_background(image_path):
+    with open(image_path, "rb") as image_file:
+        #encoded_image = image_file.read()
+        encoded_image = base64.b64encode(image_file.read()).decode()  # Codificar la imagen en base64
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url(data:image/jpeg;base64,{encoded_image});
+            background-size: cover;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+# Llamar a la función para configurar el fondo
+set_background('images/fondo_btc.png')  # También puedes usar una ruta local 'assets/background.png'
+
+
+
 st.title("Btc prediction with Streamlit")
 lista_temporalidades = ['1D', '4H', '1H', '5M']
 
@@ -126,6 +148,7 @@ col1, col2 = st.columns([1, 3])  # Ajusta las proporciones de ancho
 # Mostrar el panel de información en la columna izquierda
 with col1:
     #temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades)
+    #index = 0 carga el primer valor de la lista, es decir, por defecto el valor de "1d"
     temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades, index=0)
     st.subheader("Panel de Información")
     #info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
