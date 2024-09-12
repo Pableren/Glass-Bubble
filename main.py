@@ -45,7 +45,9 @@ def crear_grafico_valores_reales(data, temporalidad):
         xaxis_title='Fecha',
         yaxis_title='Precio',
         hovermode='x',
-        template='plotly_white'
+        template='plotly_white',
+        plot_bgcolor='skyblue',  # Fondo del gráfico (área donde están las líneas)
+        paper_bgcolor='gray'
     )
     return fig
 
@@ -53,9 +55,9 @@ def crear_grafico_valores_reales(data, temporalidad):
 def crear_grafico_predicciones(data, predictions, temporalidad):
     fig = go.Figure()
     predicciones = predictions
-    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['close'].values[-200:], 
+    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['close'].values[-200:], line=dict(color='gray'),
                              mode='lines+markers', name='Valores Reales', marker=dict(color='yellow', symbol='cross')))
-    fig.add_trace(go.Scatter(x=predicciones.index, y=predicciones.pred.values, 
+    fig.add_trace(go.Scatter(x=predicciones.index, y=predicciones.pred.values, line=dict(color='gray'),
                              mode='lines+markers', name='Predicciones en 5 Pasos', marker=dict(color='green')))
     
     fig.update_layout(
@@ -63,7 +65,9 @@ def crear_grafico_predicciones(data, predictions, temporalidad):
         xaxis_title='Fecha',
         yaxis_title='Precio',
         hovermode='x',
-        template='plotly_white'
+        template='plotly_white',
+        plot_bgcolor='skyblue',  # Fondo del gráfico (área donde están las líneas)
+        paper_bgcolor='gray'
     )
     return fig
 import base64  # Para codificar la imagen a base64
@@ -89,9 +93,11 @@ set_background('images/fondo_gb.png')  # También puedes usar una ruta local 'as
 
 
 
-st.title("Btc prediction with Streamlit")
+#st.title("Glass Bubble Services")
+#st.title("<font color='#000000'> :glass_of_wine: Glass Bubble Services </font>")
 lista_temporalidades = ['1D', '4H', '1H', '5M']
-
+# Usamos HTML en st.markdown para aplicar color negro al título
+st.markdown("<h1 style='color: black;'>Glass Bubble Services</h1>", unsafe_allow_html=True)
 
 # Funciones para estilo de celdas (No son directamente aplicables en Streamlit pero pueden ser usadas para condicionales en visualizaciones)
 def estilo_cci(value, lim_inf=-100, lim_sup=100):
