@@ -126,7 +126,7 @@ def create_info_table(volume, volatility):
 
 
 # Función para generar la tabla con estilos en HTML
-def create_info_table_with_style(volume, volatility):
+def create_info_table_with_style(rsi, cci,k,d):
     # Crear la tabla en HTML
     html = f"""
     <table style="width:100%; border-collapse: collapse; background-color: #397cc4;">
@@ -135,12 +135,20 @@ def create_info_table_with_style(volume, volatility):
             <th style="border: 1px solid black; padding: 3px;">Valor</th>
         </tr>
         <tr>
-            <td style="border: 1px solid black; padding: 3px;">Volumen</td>
-            <td style="border: 1px solid black; padding: 3px; {get_cell_style(volume)}">{volume}</td>
+            <td style="border: 1px solid black; padding: 3px;">Índice de Fuerza Relativa(RSI)</td>
+            <td style="border: 1px solid black; padding: 3px; {estilo_porcentuales(rsi)}">{rsi}</td>
         </tr>
         <tr>
-            <td style="border: 1px solid black; padding: 3px;">Volatilidad</td>
-            <td style="border: 1px solid black; padding: 3px; {estilo_porcentuales(volatility)}">{volatility}</td>
+            <td style="border: 1px solid black; padding: 3px;">Índice de Canal de Materias Primas(CCI)</td>
+            <td style="border: 1px solid black; padding: 3px; {estilo_cci(cci)}">{cci}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; padding: 3px;">Oscilador Estocástico(OE)(K)</td>
+            <td style="border: 1px solid black; padding: 3px; {estilo_porcentuales(k)}">{k}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; padding: 3px;">Promedio movil del OE(D)</td>
+            <td style="border: 1px solid black; padding: 3px; {estilo_porcentuales(d)}">{d}</td>
         </tr>
     </table>
     """
