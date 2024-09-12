@@ -9,17 +9,22 @@ import plotly.graph_objects as go
 # Conectar a la base de datos
 conn = sql.connect('Data/db/btc.db')
 cursor = conn.cursor()
-
+#CCI,K,D,rsi
+#MiddleBand,UpperBand,LowerBand	
 # Cargar los datos para cada temporalidad
 def cargar_datos(temporalidad):
     if temporalidad == '1D':
-        return pd.read_sql_query(""" SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100 FROM btc_1d""", conn)
+        return pd.read_sql_query(""" SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100,CCI,K,D,
+                                 MiddleBand,UpperBand,LowerBand FROM btc_1d""", conn)
     elif temporalidad == '4H':
-        return pd.read_sql_query("SELECT * FROM btc_4h", conn)
+        return pd.read_sql_query("""SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100,CCI,K,D,
+                                 MiddleBand,UpperBand,LowerBand FROM btc_4h""", conn)
     elif temporalidad == '1H':
-        return pd.read_sql_query("SELECT * FROM btc_1h", conn)
+        return pd.read_sql_query("""SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100,CCI,K,D,
+                                 MiddleBand,UpperBand,LowerBand FROM btc_1h""", conn)
     elif temporalidad == '5M':
-        return pd.read_sql_query("SELECT * FROM btc_5m", conn)
+        return pd.read_sql_query("""SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100,CCI,K,D,
+                                 MiddleBand,UpperBand,LowerBand FROM btc_5m""", conn)
 
 def entrenar_y_predecir(temporalidad):
     #data = func.load_and_prepare_data_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
@@ -80,7 +85,7 @@ def set_background(image_path):
         unsafe_allow_html=True
     )
 # Llamar a la función para configurar el fondo
-set_background('images/fondo_btc.png')  # También puedes usar una ruta local 'assets/background.png'
+set_background('images/fondo_gb.png')  # También puedes usar una ruta local 'assets/background.png'
 
 
 
@@ -97,7 +102,7 @@ def estilo_cci(value, lim_inf=-100, lim_sup=100):
     else:
         return "background-color: grey; color: black;"
 
-def estilo_porcentuales(value, lim_inf=20, lim_sup=80):
+def estilo_porcentuales(value, lim_inf=30, lim_sup=70):
     if value < lim_inf:
         return "background-color: green; color: black;"
     elif value > lim_sup:
