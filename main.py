@@ -173,8 +173,13 @@ with col1:
         
         volume = data['volume'].iloc[-1]
         volatility = data['volatility'].iloc[-1]
+        
+        rsi = data['rsi'].iloc[-1]
+        cci = data['CCI'].iloc[-1]
+        k = data['K'].iloc[-1]
+        d = data['D'].iloc[-1]
         # Generar la tabla con estilo y mostrarla con HTML
-        styled_table = create_info_table_with_style(volume, volatility)
+        styled_table = create_info_table_with_style(rsi=rsi, cci=cci,k=k,d=d)
         st.markdown(styled_table, unsafe_allow_html=True)
         
         
