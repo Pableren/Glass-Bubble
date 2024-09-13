@@ -3,32 +3,32 @@ import plotly.express as px
 import streamlit as st
 import sqlite3 as sql
 import Scripts.db_crud as db
-import Scripts.model_script as func
+#import Scripts.model_script as func
+#import Scripts.model_script as model
+#from Scripts.model_script import predict_sin_exog
+import Scripts.model_script as f
+
+#import Scripts.funciones as f
+
 import plotly.graph_objects as go
 #streamlit run main.py
 # Conectar a la base de datos
 conn = sql.connect('Data/db/btc.db')
 cursor = conn.cursor()
-#CCI,K,D,rsi
-#MiddleBand,UpperBand,LowerBand	
-# Cargar los datos para cada temporalidad
+
+# Función para cargar datos según la temporalidad
 def cargar_datos(temporalidad):
-    if temporalidad == '1D':
-        return pd.read_sql_query(""" SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100,CCI,K,D,
-                                 MiddleBand,UpperBand,LowerBand FROM btc_1d""", conn)
-    elif temporalidad == '4H':
-        return pd.read_sql_query("""SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100,CCI,K,D,
-                                 MiddleBand,UpperBand,LowerBand FROM btc_4h""", conn)
-    elif temporalidad == '1H':
-        return pd.read_sql_query("""SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100,CCI,K,D,
-                                 MiddleBand,UpperBand,LowerBand FROM btc_1h""", conn)
-    elif temporalidad == '5M':
-        return pd.read_sql_query("""SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100,CCI,K,D,
-                                 MiddleBand,UpperBand,LowerBand FROM btc_5m""", conn)
+    query = f"""
+        SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100, CCI, K, D,
+               MiddleBand, UpperBand, LowerBand
+        FROM btc_{temporalidad.lower()}
+    """
+    return pd.read_sql_query(query, conn)
+
 
 def entrenar_y_predecir(temporalidad):
     #data = func.load_and_prepare_data_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
-    data, predictions = func.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
+    data, predictions = f.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
     return data, predictions
 
 def cortar_data(temporalidad):
@@ -70,6 +70,102 @@ def crear_grafico_predicciones(data, predictions, temporalidad):
         paper_bgcolor='gray'
     )
     return fig
+
+
+# Función para crear gráfico con predicciones
+def crear_grafico_valores_predichos(data, predictions, temporalidad):
+    fig = go.Figure()
+    # Valores reales
+    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['close'].values[-200:], 
+                             mode='lines+markers', name='Valores Reales', marker=dict(color='yellow', symbol='cross')))
+    # Predicciones
+    fig.add_trace(go.Scatter(x=predictions.index, y=predictions['pred'].values, 
+                             mode='lines+markers', name='Predicciones', marker=dict(color='green')))
+    
+    fig.update_layout(
+        title=f'Valores Reales y Predicciones {temporalidad}',
+        xaxis_title='Fecha',
+        yaxis_title='Precio',
+        hovermode='x',
+        template='plotly_white',
+        plot_bgcolor='skyblue',
+        paper_bgcolor='gray'
+    )
+    return fig
+
+# Crear gráfico con medias móviles
+def agregar_medias_moviles(fig, data):
+    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['ma_5'].values[-200:], mode='lines', name='MA 5', line=dict(color='blue')))
+    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['ma_20'].values[-200:], mode='lines', name='MA 20', line=dict(color='purple')))
+    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['ma_100'].values[-200:], mode='lines', name='MA 100', line=dict(color='red')))
+    return fig
+
+# Crear gráfico con bandas de Bollinger
+def agregar_bandas_bollinger(fig, data):
+    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['MiddleBand'].values[-200:], mode='lines', name='Middle Band', line=dict(color='orange')))
+    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['UpperBand'].values[-200:], mode='lines', name='Upper Band', line=dict(color='green')))
+    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['LowerBand'].values[-200:], mode='lines', name='Lower Band', line=dict(color='red')))
+    return fig
+
+# Crear gráfico con todas las capas: valores reales, predicciones y medias móviles
+def mostrar_graficos(data, predictions, temporalidad):
+    # Crear gráfico base con valores reales
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['close'].values[-200:], 
+                             mode='lines+markers', name='Valores Reales', marker=dict(color='yellow', symbol='cross')))
+
+    # Checkbox para mostrar predicciones
+    mostrar_predicciones = st.checkbox("Mostrar Predicciones")
+    if mostrar_predicciones and predictions is not None:
+        fig.add_trace(go.Scatter(x=predictions.index, y=predictions['pred'].values, 
+                                 mode='lines+markers', name='Predicciones', marker=dict(color='green')))
+    
+    # Checkbox para mostrar medias móviles
+    mostrar_ma = st.checkbox("Mostrar Medias Móviles")
+    if mostrar_ma:
+        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['ma_5'].values[-200:], mode='lines', name='MA 5', line=dict(color='blue')))
+        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['ma_20'].values[-200:], mode='lines', name='MA 20', line=dict(color='purple')))
+        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['ma_100'].values[-200:], mode='lines', name='MA 100', line=dict(color='red')))
+
+    # Checkbox para mostrar bandas de Bollinger
+    mostrar_bandas = st.checkbox("Mostrar Bandas de Bollinger")
+    if mostrar_bandas:
+        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['MiddleBand'].values[-200:], mode='lines', name='Middle Band', line=dict(color='orange')))
+        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['UpperBand'].values[-200:], mode='lines', name='Upper Band', line=dict(color='green')))
+        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['LowerBand'].values[-200:], mode='lines', name='Lower Band', line=dict(color='red')))
+
+    # Ajustar diseño
+    fig.update_layout(
+        title=f'Valores Reales, Predicciones y Medias Móviles {temporalidad}',
+        xaxis_title='Fecha',
+        yaxis_title='Precio',
+        hovermode='x',
+        template='plotly_white',
+        plot_bgcolor='skyblue',
+        paper_bgcolor='gray'
+    )
+    
+    # Mostrar gráfico
+    st.plotly_chart(fig)
+
+
+
+# Crear gráfico con opciones de checkboxes
+#def mostrar_graficos(data, temporalidad):
+#    fig = crear_grafico_valores_reales(data, temporalidad)
+#    
+#    # Checkbox para mostrar medias móviles
+#    mostrar_ma = st.checkbox("Mostrar Medias Móviles")
+#    if mostrar_ma:
+#        fig = agregar_medias_moviles(fig, data)
+#
+#    # Checkbox para mostrar bandas de Bollinger
+#    mostrar_bandas = st.checkbox("Mostrar Bandas de Bollinger")
+#    if mostrar_bandas:
+#        fig = agregar_bandas_bollinger(fig, data)
+#
+#    st.plotly_chart(fig)
+
 import base64  # Para codificar la imagen a base64
 st.set_page_config(layout="wide")  # Esto asegura que el ancho completo se use
 # Definir la función para agregar el fondo
@@ -219,15 +315,25 @@ with col1:
     if st.button('Recortar datos'):
         recortar_data = cortar_data(temporalidad=temporalidad_seleccionada)
 
-
-# Mostrar el gráfico en la columna derecha
 with col2:
-    st.subheader(f"Gráfico {temporalidad_seleccionada}")
-    # Verificar si hay predicciones y mostrar el gráfico correspondiente
-    if st.session_state.get('predictions') is not None:
-        st.plotly_chart(crear_grafico_predicciones(st.session_state['data'], st.session_state['predictions'], temporalidad_seleccionada))
-    else:
-        st.plotly_chart(crear_grafico_valores_reales(st.session_state['data'], temporalidad_seleccionada))
+    if data is not None:
+        data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
+        mostrar_graficos(data, predictions, temporalidad_seleccionada)
 
 
 
+#with col2:
+#    st.subheader(f"Gráfico - {temporalidad_seleccionada}")
+#    
+#    # Recuperar los datos y predicciones de session_state
+#    data = st.session_state.get('data', data)
+#    predictions = st.session_state.get('predictions')
+#    
+#    # Llamar a la función para mostrar los gráficos con las opciones de checkboxes
+#    mostrar_graficos(data, temporalidad_seleccionada)
+#    
+#    # Mostrar predicciones si están disponibles
+#    if predictions is not None:
+#        st.subheader("Predicciones")
+#        fig_pred = crear_grafico_predicciones(data=data,predictions=predictions, temporalidad=temporalidad_seleccionada)
+#        st.plotly_chart(fig_pred)
