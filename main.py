@@ -3,12 +3,7 @@ import plotly.express as px
 import streamlit as st
 import sqlite3 as sql
 import Scripts.db_crud as db
-#import Scripts.model_script as func
-#import Scripts.model_script as model
-#from Scripts.model_script import predict_sin_exog
 import Scripts.model_script as f
-
-#import Scripts.funciones as f
 
 import plotly.graph_objects as go
 #streamlit run main.py
@@ -148,23 +143,6 @@ def mostrar_graficos(data, predictions, temporalidad):
     # Mostrar gráfico
     st.plotly_chart(fig)
 
-
-
-# Crear gráfico con opciones de checkboxes
-#def mostrar_graficos(data, temporalidad):
-#    fig = crear_grafico_valores_reales(data, temporalidad)
-#    
-#    # Checkbox para mostrar medias móviles
-#    mostrar_ma = st.checkbox("Mostrar Medias Móviles")
-#    if mostrar_ma:
-#        fig = agregar_medias_moviles(fig, data)
-#
-#    # Checkbox para mostrar bandas de Bollinger
-#    mostrar_bandas = st.checkbox("Mostrar Bandas de Bollinger")
-#    if mostrar_bandas:
-#        fig = agregar_bandas_bollinger(fig, data)
-#
-#    st.plotly_chart(fig)
 
 import base64  # Para codificar la imagen a base64
 st.set_page_config(layout="wide")  # Esto asegura que el ancho completo se use
