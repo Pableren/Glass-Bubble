@@ -111,6 +111,7 @@ def load_and_prepare_data_sin_exog(db_path,temporalidad):
     data = pd.read_sql_query(f"""SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100, CCI, K, D,
                MiddleBand, UpperBand, LowerBand FROM btc_{temporalidad}""", conn)
     conn.close()
+    print("data en model_script",data.tail(3))
     #data.drop(columns=[
     #    'open', 'high', 'low', 'volume', 'return', 'diff', 'volatility', 
     #    'rsi', 'ma_5', 'ma_20', 'ma_100', 'MiddleBand', 'UpperBand', 'LowerBand', 'K', 'D', 
