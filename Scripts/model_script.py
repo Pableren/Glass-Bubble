@@ -108,12 +108,13 @@ def load_and_prepare_data(db_path):
 
 def load_and_prepare_data_sin_exog(db_path,temporalidad):
     conn = sql.connect(db_path)
-    data = pd.read_sql_query(f"SELECT * FROM btc_{temporalidad}", conn)
+    data = pd.read_sql_query(f"""SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100, CCI, K, D,
+               MiddleBand, UpperBand, LowerBand FROM btc_{temporalidad}""", conn)
     conn.close()
-    data.drop(columns=[
-        'open', 'high', 'low', 'volume', 'return', 'diff', 'volatility', 
-        'rsi', 'ma_5', 'ma_20', 'ma_100', 'MiddleBand', 'UpperBand', 'LowerBand', 'K', 'D', 
-         'TP', 'CCI'], inplace=True)
+    #data.drop(columns=[
+    #    'open', 'high', 'low', 'volume', 'return', 'diff', 'volatility', 
+    #    'rsi', 'ma_5', 'ma_20', 'ma_100', 'MiddleBand', 'UpperBand', 'LowerBand', 'K', 'D', 
+    #     'TP', 'CCI'], inplace=True)
     return data
 
 # Function to create and train the model
