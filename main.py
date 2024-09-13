@@ -166,9 +166,6 @@ def set_background(image_path):
 set_background('images/fondo_gb.png')  # También puedes usar una ruta local 'assets/background.png'
 
 
-
-#st.title("Glass Bubble Services")
-#st.title("<font color='#000000'> :glass_of_wine: Glass Bubble Services </font>")
 lista_temporalidades = ['1D', '4H', '1H', '5M']
 # Usamos HTML en st.markdown para aplicar color negro al título
 st.markdown("<h1 style='color: black;'>Glass Bubble Services</h1>", unsafe_allow_html=True)
@@ -240,16 +237,11 @@ col1, col2 = st.columns([1, 3])  # Ajusta las proporciones de ancho
 
 # Mostrar el panel de información en la columna izquierda
 with col1:
-    #temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades)
     #index = 0 carga el primer valor de la lista, es decir, por defecto el valor de "1d"
     temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades, index=0)
     st.subheader("Panel de Información")
-    #info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
-    #st.table(info_panel_table)  # Mostrar tabla
     data = cargar_datos(temporalidad_seleccionada)
     if data is not None:
-        #info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
-        #st.table(info_panel_table)  # Mostrar tabla con los datos cargados
         
         volume = data['volume'].iloc[-1]
         volatility = data['volatility'].iloc[-1]
@@ -262,13 +254,8 @@ with col1:
         styled_table = create_info_table_with_style(rsi=rsi, cci=cci,k=k,d=d)
         st.markdown(styled_table, unsafe_allow_html=True)
         
-        
-    
     if st.button('Actualizar Datos'):
         data = cargar_datos(temporalidad_seleccionada)
-        #if data is not None:
-        #    info_panel_table = create_info_table(data['volume'].iloc[-1], data['volatility'].iloc[-1])
-        #    st.table(info_panel_table)  # Mostrar tabla con datos actualizados
         if temporalidad_seleccionada=='1D':
             db.actualizarData1d()
         elif temporalidad_seleccionada=='4H':
@@ -298,20 +285,3 @@ with col2:
         data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
         mostrar_graficos(data, predictions, temporalidad_seleccionada)
 
-
-
-#with col2:
-#    st.subheader(f"Gráfico - {temporalidad_seleccionada}")
-#    
-#    # Recuperar los datos y predicciones de session_state
-#    data = st.session_state.get('data', data)
-#    predictions = st.session_state.get('predictions')
-#    
-#    # Llamar a la función para mostrar los gráficos con las opciones de checkboxes
-#    mostrar_graficos(data, temporalidad_seleccionada)
-#    
-#    # Mostrar predicciones si están disponibles
-#    if predictions is not None:
-#        st.subheader("Predicciones")
-#        fig_pred = crear_grafico_predicciones(data=data,predictions=predictions, temporalidad=temporalidad_seleccionada)
-#        st.plotly_chart(fig_pred)
