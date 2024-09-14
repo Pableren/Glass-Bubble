@@ -3,6 +3,35 @@ import numpy as np
 #from datetime import timedelta
 import ta
 from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import plotly_express as px
+import seaborn as sns
+
+def graficar_histogramas(df, columnas):
+    # Definir el número de columnas
+    n_cols = 3
+    # Calcular el número de filas necesarias
+    n_rows = int(np.ceil(len(columnas) / n_cols))
+    
+    # Crear una figura con subplots distribuidos en n_rows x n_cols
+    fig, axes = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(15, 5*n_rows))
+    
+    # Aplanar los ejes para facilitar el acceso con un solo índice
+    axes = axes.flatten()
+
+    for i, columna in enumerate(columnas):
+        # Graficar histograma en su posición correspondiente
+        sns.histplot(data=df, x=columna, ax=axes[i], bins=50)
+        axes[i].set_xlim(auto=True)
+        axes[i].set_ylim(auto=True)
+    
+    # Eliminar ejes vacíos si hay
+    for j in range(i+1, len(axes)):
+        fig.delaxes(axes[j])
+    
+    plt.show()
+
+
 
 def calcular_recompensa_y_cuenta_regresiva_df4(df_4h, bloques_minados_hasta_hoy=740000):
     # Dict con la info de los halvings del Bitcoin
