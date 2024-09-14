@@ -4,18 +4,28 @@ import streamlit as st
 import sqlite3 as sql
 import Scripts.db_crud as db
 import Scripts.model_script as f
-
+import base64  # Para codificar la imagen a base64
 import plotly.graph_objects as go
 #streamlit run main.py
 # Conectar a la base de datos
 conn = sql.connect('Data/db/btc.db')
 cursor = conn.cursor()
 
+#if 'data' not in st.session_state:
+#    st.session_state.data = None
+#if 'predictions' not in st.session_state:
+#    st.session_state.predictions = None
+
+# Inicializar session_state para datos y predicciones si no existen
 if 'data' not in st.session_state:
     st.session_state.data = None
 if 'predictions' not in st.session_state:
     st.session_state.predictions = None
-    
+if 'temporalidad_seleccionada' not in st.session_state:
+    st.session_state.temporalidad_seleccionada = '1D'  # Temporalidad por defecto
+
+
+
 # Función para cargar datos según la temporalidad
 def cargar_datos(temporalidad):
     query = f"""
@@ -25,19 +35,19 @@ def cargar_datos(temporalidad):
     """
     return pd.read_sql_query(query, conn)
 
-# Función para entrenar y predecir (se ejecuta solo cuando se selecciona "Mostrar Predicciones")
-#def entrenar_y_predecir(temporalidad):
-#    st.session_state.data, st.session_state.predictions = f.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
-#    st.session_state.predicciones_entrenadas = True  # Marcar que ya se entrenó
+# Inicializar los datos si aún no se han cargado
+#if st.session_state.data is None:
+#    st.session_state.data = cargar_datos('1D')  # Temporalidad por defecto
+
+# Cargar los datos por defecto si no se han cargado
+if st.session_state.data is None:
+    st.session_state.data = cargar_datos(st.session_state.temporalidad_seleccionada)
 
 def entrenar_y_predecir(temporalidad):
     data, predictions = f.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
     st.session_state.data = data
     st.session_state.predictions = predictions
     st.session_state.predicciones_entrenadas = True
-    # Debugging
-    st.write("Data:", data)
-    st.write("Predictions:", predictions)
 
 def cortar_data(temporalidad):
     db.cortar_data(temporalidad=temporalidad)
@@ -61,7 +71,6 @@ def agregar_bandas_bollinger(fig, data):
 def mostrar_graficos(data, predictions, temporalidad):
     fig = go.Figure()
     # Valores reales
-    print(data)
     fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['close'].values[-200:], mode='lines+markers', name='Valores Reales', marker=dict(color='yellow', symbol='cross')))
     
     # Mostrar predicciones si está seleccionado
@@ -88,11 +97,6 @@ def mostrar_graficos(data, predictions, temporalidad):
 
 
 
-
-
-
-
-import base64  # Para codificar la imagen a base64
 st.set_page_config(layout="wide")  # Esto asegura que el ancho completo se use
 # Definir la función para agregar el fondo
 def set_background(image_path):
@@ -179,21 +183,31 @@ def create_info_table_with_style(rsi, cci,k,d):
     """
     return html
 
-
+# Determinar el índice de la temporalidad previamente seleccionada
+#temporalidad_seleccionada = st.selectbox(
+#    "Selecciona la temporalidad",
+#    lista_temporalidades,
+#    index=lista_temporalidades.index(st.session_state.temporalidad_seleccionada)
+#)
+# Guardar la temporalidad seleccionada en el estado de la sesión
+#st.session_state.temporalidad_seleccionada = temporalidad_seleccionada
 # Crear columnas: la primera columna será el panel de información y la segunda columna los gráficos
 col1, col2 = st.columns([1, 3])  # Ajusta las proporciones de ancho
 
 # Mostrar el panel de información en la columna izquierda
 with col1:
     #index = 0 carga el primer valor de la lista, es decir, por defecto el valor de "1d"
-    temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades, index=0)
+    #temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades, index=0)
+    temporalidad_seleccionada = st.selectbox(
+    "Selecciona la temporalidad",
+    lista_temporalidades,
+    index=lista_temporalidades.index(st.session_state.temporalidad_seleccionada))
+    st.session_state.temporalidad_seleccionada = temporalidad_seleccionada
+    print("temporalidad",temporalidad_seleccionada)
     st.subheader("Panel de Información")
+    #data = cargar_datos(temporalidad_seleccionada)
     data = cargar_datos(temporalidad_seleccionada)
     if data is not None:
-        
-        volume = data['volume'].iloc[-1]
-        volatility = data['volatility'].iloc[-1]
-        
         rsi = data['rsi'].iloc[-1]
         cci = data['CCI'].iloc[-1]
         k = data['K'].iloc[-1]
@@ -216,34 +230,16 @@ with col1:
         
     if st.button('Entrenar Modelo'):
         entrenar_y_predecir(temporalidad_seleccionada)
-    # Botón para entrenar el modelo
-    #if st.button('Entrenar Modelo'):
-    #    data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
-    #    # Guardar las predicciones para usarlas en la segunda columna
-    #    st.session_state['data'] = data
-    #    st.session_state['predictions'] = predictions
-    #else:
-    #    # Guardar los datos reales para usarlos en la segunda columna
-    #    st.session_state['data'] = data
-    #    st.session_state['predictions'] = None
 
     if st.button('Recortar datos'):
         recortar_data = cortar_data(temporalidad=temporalidad_seleccionada)
 
-# Gráficos en la segunda columna
 with col2:
-    print("data en col2",data)
-    if 'predictions' in st.session_state:
+    # Asegúrate de que data no sea None
+    if st.session_state.data is not None:
         mostrar_graficos(st.session_state.data, st.session_state.predictions, temporalidad_seleccionada)
-
-
-#with col2:
-#    if data is not None:
-#        data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
-#        mostrar_graficos(data, predictions, temporalidad_seleccionada)
-
-
-
+    else:
+        st.write("Los datos no están disponibles. Por favor, carga los datos o entrena el modelo.")
 
 
 # Crear gráfico con todas las capas: valores reales, predicciones y medias móviles
@@ -286,3 +282,14 @@ with col2:
 #    
 #    # Mostrar gráfico
 #    st.plotly_chart(fig)
+
+# Botón para entrenar el modelo
+    #if st.button('Entrenar Modelo'):
+    #    data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
+    #    # Guardar las predicciones para usarlas en la segunda columna
+    #    st.session_state['data'] = data
+    #    st.session_state['predictions'] = predictions
+    #else:
+    #    # Guardar los datos reales para usarlos en la segunda columna
+    #    st.session_state['data'] = data
+    #    st.session_state['predictions'] = None
