@@ -24,7 +24,16 @@ if 'predictions' not in st.session_state:
 if 'temporalidad_seleccionada' not in st.session_state:
     st.session_state.temporalidad_seleccionada = '1D'  # Temporalidad por defecto
 
-
+# Función para actualizar los datos
+def actualizar_datos(temporalidad):
+    if temporalidad == '1D':
+        db.actualizarData1d()
+    elif temporalidad == '4H':
+        db.actualizarData4h()
+    elif temporalidad == '1H':
+        db.actualizarData1h()
+    elif temporalidad == '5M':
+        db.actualizarData5m()
 
 # Función para cargar datos según la temporalidad
 def cargar_datos(temporalidad):
@@ -192,54 +201,112 @@ def create_info_table_with_style(rsi, cci,k,d):
 # Guardar la temporalidad seleccionada en el estado de la sesión
 #st.session_state.temporalidad_seleccionada = temporalidad_seleccionada
 # Crear columnas: la primera columna será el panel de información y la segunda columna los gráficos
+
+# Selectbox para seleccionar la temporalidad
+#temporalidad_seleccionada = st.selectbox(
+#    "Selecciona la temporalidad",
+#    ['1D', '4H', '1H', '5M'],
+#    index=['1D', '4H', '1H', '5M'].index(st.session_state.temporalidad_seleccionada)
+#)
+#
+## Guardar la temporalidad seleccionada en el estado de la sesión
+#st.session_state.temporalidad_seleccionada = temporalidad_seleccionada
+
 col1, col2 = st.columns([1, 3])  # Ajusta las proporciones de ancho
 
-# Mostrar el panel de información en la columna izquierda
+
 with col1:
-    #index = 0 carga el primer valor de la lista, es decir, por defecto el valor de "1d"
-    #temporalidad_seleccionada = st.selectbox("Selecciona la temporalidad", lista_temporalidades, index=0)
+    # Selección de temporalidad
     temporalidad_seleccionada = st.selectbox(
-    "Selecciona la temporalidad",
-    lista_temporalidades,
-    index=lista_temporalidades.index(st.session_state.temporalidad_seleccionada))
-    st.session_state.temporalidad_seleccionada = temporalidad_seleccionada
-    print("temporalidad",temporalidad_seleccionada)
+        "Selecciona la temporalidad",
+        ['1D', '4H', '1H', '5M'],
+        index=lista_temporalidades.index(st.session_state.temporalidad_seleccionada)
+    )
+
+    # Guardar la temporalidad seleccionada en el estado de la sesión
+    if st.session_state.temporalidad_seleccionada != temporalidad_seleccionada:
+        st.session_state.temporalidad_seleccionada = temporalidad_seleccionada
+        st.session_state.data = cargar_datos(temporalidad_seleccionada)  # Recargar datos al cambiar temporalidad
+
     st.subheader("Panel de Información")
-    #data = cargar_datos(temporalidad_seleccionada)
-    data = cargar_datos(temporalidad_seleccionada)
-    if data is not None:
+
+    # Mostrar datos técnicos
+    if st.session_state.data is not None:
+        data = st.session_state.data
         rsi = data['rsi'].iloc[-1]
         cci = data['CCI'].iloc[-1]
         k = data['K'].iloc[-1]
         d = data['D'].iloc[-1]
-        # Generar la tabla con estilo y mostrarla con HTML
-        styled_table = create_info_table_with_style(rsi=rsi, cci=cci,k=k,d=d)
+        styled_table = create_info_table_with_style(rsi=rsi, cci=cci, k=k, d=d)
         st.markdown(styled_table, unsafe_allow_html=True)
-        
+
+    # Botones de acción
     if st.button('Actualizar Datos'):
         data = cargar_datos(temporalidad_seleccionada)
-        if temporalidad_seleccionada=='1D':
-            db.actualizarData1d()
-        elif temporalidad_seleccionada=='4H':
-            db.actualizarData4h()
-        elif temporalidad_seleccionada=='1H':
-            db.actualizarData1h()
-        elif temporalidad_seleccionada=='5M':
-            db.actualizarData5m()
-        data = cargar_datos(temporalidad_seleccionada)
-        
+        # Aquí llamas a las funciones de actualización de datos
+        actualizar_datos(temporalidad_seleccionada)
+        st.session_state.data = cargar_datos(temporalidad_seleccionada)
+
     if st.button('Entrenar Modelo'):
         entrenar_y_predecir(temporalidad_seleccionada)
 
     if st.button('Recortar datos'):
-        recortar_data = cortar_data(temporalidad=temporalidad_seleccionada)
+        cortar_data(temporalidad_seleccionada)
 
+# Mostrar gráficos en la columna derecha
 with col2:
-    # Asegúrate de que data no sea None
     if st.session_state.data is not None:
-        mostrar_graficos(st.session_state.data, st.session_state.predictions, temporalidad_seleccionada)
+        mostrar_graficos(st.session_state.data, st.session_state.predictions, st.session_state.temporalidad_seleccionada)
     else:
         st.write("Los datos no están disponibles. Por favor, carga los datos o entrena el modelo.")
+
+
+
+
+# Mostrar el panel de información en la columna izquierda
+#with col1:
+#    #index = 0 carga el primer valor de la lista, es decir, por defecto el valor de "1d"
+#    st.subheader("Panel de Información")
+#    #data = cargar_datos(temporalidad_seleccionada)
+#    data = cargar_datos(temporalidad_seleccionada)
+#    if data is not None:
+#        rsi = data['rsi'].iloc[-1]
+#        cci = data['CCI'].iloc[-1]
+#        k = data['K'].iloc[-1]
+#        d = data['D'].iloc[-1]
+#        # Generar la tabla con estilo y mostrarla con HTML
+#        styled_table = create_info_table_with_style(rsi=rsi, cci=cci,k=k,d=d)
+#        st.markdown(styled_table, unsafe_allow_html=True)
+#        
+#    #if st.button('Actualizar Datos'):
+#    #    data = cargar_datos(temporalidad_seleccionada)
+#    #    if temporalidad_seleccionada=='1D':
+#    #        db.actualizarData1d()
+#    #    elif temporalidad_seleccionada=='4H':
+#    #        db.actualizarData4h()
+#    #    elif temporalidad_seleccionada=='1H':
+#    #        db.actualizarData1h()
+#    #    elif temporalidad_seleccionada=='5M':
+#    #        db.actualizarData5m()
+#    #    data = cargar_datos(temporalidad_seleccionada)
+#    
+#    if st.button('Actualizar Datos'):
+#        # Lógica para actualizar los datos y almacenarlos en el estado de la sesión
+#        actualizar_datos(temporalidad_seleccionada)
+#        st.session_state.data = cargar_datos(temporalidad_seleccionada)
+#    
+#    if st.button('Entrenar Modelo'):
+#        entrenar_y_predecir(temporalidad_seleccionada)
+#
+#    if st.button('Recortar datos'):
+#        recortar_data = cortar_data(temporalidad=temporalidad_seleccionada)
+#
+#with col2:
+#    # Asegúrate de que data no sea None
+#    if st.session_state.data is not None:
+#        mostrar_graficos(st.session_state.data, st.session_state.predictions, temporalidad_seleccionada)
+#    else:
+#        st.write("Los datos no están disponibles. Por favor, carga los datos o entrena el modelo.")
 
 
 # Crear gráfico con todas las capas: valores reales, predicciones y medias móviles
