@@ -202,6 +202,16 @@ def actualizarData4h():
     conn.commit()
     conn.close()
     
+exchange = ccxt.binance()
+def fetch_ohlcv_data(exchange, symbol, timeframe, since=None,limit=360):
+    """
+    Función para obtener datos OHLCV del exchange.
+    Devuelve: DataFrame: DataFrame con datos OHLCV.
+    """
+    data = exchange.fetch_ohlcv(symbol, timeframe, since=since, limit=limit)
+    df = pd.DataFrame(data, columns=['time', 'open', 'high', 'low', 'close', 'volume'])
+    #df['time'] = pd.to_datetime(df['time'], unit='ms')
+    return df
 
 def actualizarData1d():
     """
@@ -247,7 +257,6 @@ def actualizarData1d():
         diferencia_minutos = (date_new - date_old).total_seconds() / 60
     df_actual = pd.read_sql_query("SELECT * FROM btc_1d", conn)
     df_actual = funciones.etl_1d_4h(df_actual)
-    #df_actual = funciones.calcular_recompensa_y_cuenta_regresiva_1d(df_1d=df_actual)
     df_actual.to_sql('btc_1d', conn, if_exists='replace', index=False)
     conn.commit()
     conn.close()
