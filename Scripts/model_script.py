@@ -83,7 +83,7 @@ def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=No
     pred_ultimo_valor = forecaster.predict(steps=steps)
     pred_ultimo_valor = pd.DataFrame(pred_ultimo_valor)
     predicciones_4h = pd.concat(objs=[predicciones,pred_ultimo_valor], axis=0)
-    print("predicciones ",predicciones_4h)
+    print("metrica: ",metrica)
     return predicciones_4h
 
 def predict_sin_exog(db_path, lags=[1,30,90,180], steps=5,temporalidad=None):
