@@ -182,9 +182,6 @@ def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=No
     inicio_train = pd.to_datetime(inicio_train)
     formatted_date_inicio = inicio_train.strftime('%Y-%m-%d %H:%M:%S')
     fin_train = pd.to_datetime(fin_train)
-    formatted_date_fin = fin_train.strftime('%Y-%m-%d %H:%M:%S')
-    # Imprimir las fechas para asegurarse de que sean correctas
-    #print(len(data.loc[inicio_train:fin_train]))
     metrica, predicciones = backtesting_forecaster(
         forecaster         = forecaster,
         y                  = data.loc[formatted_date_inicio:, 'close'],
