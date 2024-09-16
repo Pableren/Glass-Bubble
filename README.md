@@ -4,6 +4,16 @@
 
 ### Glass Bubble se destaca en el mercado por ofrecer servicios de monitorio y seguimiento de modelos de ML y DP.
 
+### Tabla de contenidos
+
+1. [Contexto](#contexto)
+2. [Instalacion y requisitos](#instalacion-y-requisitos)
+3. [Objetivos](#objetivos)
+4. [Entregables](#entregables)
+5. [Autor](#autor)
+
+
+
 ## Contexto
 #### Bull Market Broker(BMB) llego a la conclusion de que la adaptacion de su plataforma para incluir criptomonedas era algo por concluir.
 
@@ -11,7 +21,7 @@ Bull Market Broker busca expandir su base de usuarios y capitalizar el creciente
 
 El público objetivo de BMB son principalmente traders activos y entusiastas de las criptomonedas con conocimientos básicos de análisis técnico. Estos usuarios buscan herramientas que les permitan realizar un seguimiento en tiempo real de los precios, identificar patrones y tomar decisiones de inversión informadas.
 
-#### Bitcoin ha sido seleccionado como el primer activo debido a su alta liquidez, reconocimiento de marca y madurez en comparación con otras criptomonedas. Además, Bitcoin es ampliamente considerado como el "oro digital" y sirve como una referencia para el resto del mercado de criptomonedas.
+#### Bitcoin ha sido seleccionado como el principal activo debido a su alta liquidez, reconocimiento de marca y madurez en comparación con otras criptomonedas. Además, Bitcoin es ampliamente considerado como el "oro digital" y sirve como una referencia para el resto del mercado de criptomonedas.
 
 #### El objetivo del cliente es un tablero interactivo con un panel donde se encuentren las variables que considere mas importantes a la hora de evaluar la serie.
 #### Por lo que, el alcance del proyecto se extendera solamente hasta bitcoin con 4 temporalidades:
@@ -22,6 +32,26 @@ El público objetivo de BMB son principalmente traders activos y entusiastas de 
 - 5 min.
 
 Se consideraran otras mejoras del tablero en la seccion de Upgrades.
+
+## Instalacion y requisitos
+
+- Python()
+- Sql(sqlite3)
+#### Librerias de Python
+Manipulacion:
+- Pandas()
+- Numpy()
+- pyarrow()
+- sqlite()
+
+Visualizacion:
+- Matplolib()
+- Seaborn()
+
+Modelo de Machine Learning
+- Sklearn()
+- ForecasterAutoreg()
+- LGBMRegresor()
 
 ## Objetivos
 
@@ -140,4 +170,7 @@ Las funciones de actualizacion de los datos, presentan una posible mejora respec
 
 - Emplear una eficientizacion respecto a las variables que se manipulan dentro de main para eliminar variables o archivos que puedan acumular datos en memoria.
 
-
+### Autor:
+Pablo Chamena
+- Linkedin:
+- Github:
