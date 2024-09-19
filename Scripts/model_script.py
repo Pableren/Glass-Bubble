@@ -84,20 +84,11 @@ def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=No
     pred_ultimo_valor = pd.DataFrame(pred_ultimo_valor)
     print("pred_ultimo_valor: ",pred_ultimo_valor)
     print("predicciones: ",predicciones[0])
-    print("type of predicciones",type(predicciones[0]))    #predicciones = pd.DataFrame(predicciones)
-    #print("ultimo valor",pred_ultimo_valor)
-    #print(type(pred_ultimo_valor))
-    #print("predic",predicciones)
-    #print(type(predicciones))
+    print("type of predicciones",type(predicciones[0]))
+    #predicciones = pd.DataFrame(predicciones)
     predic = pd.concat(objs=[pd.Series(predicciones),pred_ultimo_valor], axis=0)
-    #print("metrica: ",metrica)
-    #print("predic",predic)
-    #predic.reset_index(inplace=True,drop=True)
-    #print(predic)
-    #print(predic.columns)
+    predic.reset_index(inplace=True,drop=True)
     predic.columns = ['pred']
-    #print(predic)
-    #df_pred =
     return predic
 
 def predict_sin_exog(db_path, lags=[1,30,90,180], steps=5,temporalidad=None):
