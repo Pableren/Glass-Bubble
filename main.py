@@ -11,10 +11,6 @@ import plotly.graph_objects as go
 conn = sql.connect('Data/db/btc.db')
 cursor = conn.cursor()
 
-#if 'data' not in st.session_state:
-#    st.session_state.data = None
-#if 'predictions' not in st.session_state:
-#    st.session_state.predictions = None
 
 # Inicializar session_state para datos y predicciones si no existen
 if 'data' not in st.session_state:
@@ -84,7 +80,24 @@ def mostrar_graficos(data, predictions, temporalidad):
     
     # Mostrar predicciones si está seleccionado
     if st.checkbox("Mostrar Predicciones") and predictions is not None:
-        fig.add_trace(go.Scatter(x=predictions.index, y=predictions['pred'].values, mode='lines+markers', name='Predicciones', marker=dict(color='green')))
+        print(type(predictions))
+        print(predictions.columns)
+        print(predictions)
+        largo_predictions = len(predictions)
+        largo_predictions = largo_predictions - 5
+        print(largo_predictions)
+        # Crear un dataframe de predicciones con fechas alineadas
+        #predictions['date'] = pd.date_range(start=data['date'].values[-largo_predictions], periods=len(predictions), freq=temporalidad)
+        if (temporalidad in ['4h','4H']):
+            predictions['date'] = pd.date_range(start=data['date'].values[-largo_predictions], periods=len(predictions),freq='4H')
+        elif (temporalidad in ['1h','1H']):
+            predictions['date'] = pd.date_range(start=data['date'].values[-largo_predictions], periods=len(predictions),freq='1H')
+        elif (temporalidad in ['5m','5M']):
+            predictions['date'] = pd.date_range(start=data['date'].values[-largo_predictions], periods=len(predictions),freq='5min')
+        elif (temporalidad in ['1d','1D']):
+            predictions['date'] = pd.date_range(start=data['date'].values[-largo_predictions], periods=len(predictions),freq='1D')
+        #fig.add_trace(go.Scatter(x=predictions.index, y=predictions['pred'].values, mode='lines+markers', name='Predicciones', marker=dict(color='green')))
+        fig.add_trace(go.Scatter(x=predictions['date'], y=predictions['pred'].values, mode='lines+markers', name='Predicciones', marker=dict(color='green')))
     
     # Mostrar medias móviles si está seleccionado
     if st.checkbox("Mostrar Medias Móviles"):
@@ -192,25 +205,6 @@ def create_info_table_with_style(rsi, cci,k,d):
     """
     return html
 
-# Determinar el índice de la temporalidad previamente seleccionada
-#temporalidad_seleccionada = st.selectbox(
-#    "Selecciona la temporalidad",
-#    lista_temporalidades,
-#    index=lista_temporalidades.index(st.session_state.temporalidad_seleccionada)
-#)
-# Guardar la temporalidad seleccionada en el estado de la sesión
-#st.session_state.temporalidad_seleccionada = temporalidad_seleccionada
-# Crear columnas: la primera columna será el panel de información y la segunda columna los gráficos
-
-# Selectbox para seleccionar la temporalidad
-#temporalidad_seleccionada = st.selectbox(
-#    "Selecciona la temporalidad",
-#    ['1D', '4H', '1H', '5M'],
-#    index=['1D', '4H', '1H', '5M'].index(st.session_state.temporalidad_seleccionada)
-#)
-#
-## Guardar la temporalidad seleccionada en el estado de la sesión
-#st.session_state.temporalidad_seleccionada = temporalidad_seleccionada
 
 col1, col2 = st.columns([1, 3])  # Ajusta las proporciones de ancho
 
@@ -261,102 +255,3 @@ with col2:
         st.write("Los datos no están disponibles. Por favor, carga los datos o entrena el modelo.")
 
 
-
-
-# Mostrar el panel de información en la columna izquierda
-#with col1:
-#    #index = 0 carga el primer valor de la lista, es decir, por defecto el valor de "1d"
-#    st.subheader("Panel de Información")
-#    #data = cargar_datos(temporalidad_seleccionada)
-#    data = cargar_datos(temporalidad_seleccionada)
-#    if data is not None:
-#        rsi = data['rsi'].iloc[-1]
-#        cci = data['CCI'].iloc[-1]
-#        k = data['K'].iloc[-1]
-#        d = data['D'].iloc[-1]
-#        # Generar la tabla con estilo y mostrarla con HTML
-#        styled_table = create_info_table_with_style(rsi=rsi, cci=cci,k=k,d=d)
-#        st.markdown(styled_table, unsafe_allow_html=True)
-#        
-#    #if st.button('Actualizar Datos'):
-#    #    data = cargar_datos(temporalidad_seleccionada)
-#    #    if temporalidad_seleccionada=='1D':
-#    #        db.actualizarData1d()
-#    #    elif temporalidad_seleccionada=='4H':
-#    #        db.actualizarData4h()
-#    #    elif temporalidad_seleccionada=='1H':
-#    #        db.actualizarData1h()
-#    #    elif temporalidad_seleccionada=='5M':
-#    #        db.actualizarData5m()
-#    #    data = cargar_datos(temporalidad_seleccionada)
-#    
-#    if st.button('Actualizar Datos'):
-#        # Lógica para actualizar los datos y almacenarlos en el estado de la sesión
-#        actualizar_datos(temporalidad_seleccionada)
-#        st.session_state.data = cargar_datos(temporalidad_seleccionada)
-#    
-#    if st.button('Entrenar Modelo'):
-#        entrenar_y_predecir(temporalidad_seleccionada)
-#
-#    if st.button('Recortar datos'):
-#        recortar_data = cortar_data(temporalidad=temporalidad_seleccionada)
-#
-#with col2:
-#    # Asegúrate de que data no sea None
-#    if st.session_state.data is not None:
-#        mostrar_graficos(st.session_state.data, st.session_state.predictions, temporalidad_seleccionada)
-#    else:
-#        st.write("Los datos no están disponibles. Por favor, carga los datos o entrena el modelo.")
-
-
-# Crear gráfico con todas las capas: valores reales, predicciones y medias móviles
-#def mostrar_graficos(data, predictions, temporalidad):
-#    # Crear gráfico base con valores reales
-#    fig = go.Figure()
-#    fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['close'].values[-200:], 
-#                             mode='lines+markers', name='Valores Reales', marker=dict(color='yellow', symbol='cross')))
-#
-#    # Checkbox para mostrar predicciones
-#    mostrar_predicciones = st.checkbox("Mostrar Predicciones")
-#    if mostrar_predicciones and predictions is not None:
-#        fig.add_trace(go.Scatter(x=predictions.index, y=predictions['pred'].values, 
-#                                 mode='lines+markers', name='Predicciones', marker=dict(color='green')))
-#    
-#    # Checkbox para mostrar medias móviles
-#    mostrar_ma = st.checkbox("Mostrar Medias Móviles")
-#    if mostrar_ma:
-#        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['ma_5'].values[-200:], mode='lines', name='MA 5', line=dict(color='blue')))
-#        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['ma_20'].values[-200:], mode='lines', name='MA 20', line=dict(color='purple')))
-#        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['ma_100'].values[-200:], mode='lines', name='MA 100', line=dict(color='red')))
-#
-#    # Checkbox para mostrar bandas de Bollinger
-#    mostrar_bandas = st.checkbox("Mostrar Bandas de Bollinger")
-#    if mostrar_bandas:
-#        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['MiddleBand'].values[-200:], mode='lines', name='Middle Band', line=dict(color='orange')))
-#        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['UpperBand'].values[-200:], mode='lines', name='Upper Band', line=dict(color='green')))
-#        fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['LowerBand'].values[-200:], mode='lines', name='Lower Band', line=dict(color='red')))
-#
-#    # Ajustar diseño
-#    fig.update_layout(
-#        title=f'Valores Reales, Predicciones y Medias Móviles {temporalidad}',
-#        xaxis_title='Fecha',
-#        yaxis_title='Precio',
-#        hovermode='x',
-#        template='plotly_white',
-#        plot_bgcolor='skyblue',
-#        paper_bgcolor='gray'
-#    )
-#    
-#    # Mostrar gráfico
-#    st.plotly_chart(fig)
-
-# Botón para entrenar el modelo
-    #if st.button('Entrenar Modelo'):
-    #    data, predictions = entrenar_y_predecir(temporalidad_seleccionada)
-    #    # Guardar las predicciones para usarlas en la segunda columna
-    #    st.session_state['data'] = data
-    #    st.session_state['predictions'] = predictions
-    #else:
-    #    # Guardar los datos reales para usarlos en la segunda columna
-    #    st.session_state['data'] = data
-    #    st.session_state['predictions'] = None
