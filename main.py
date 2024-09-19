@@ -39,11 +39,6 @@ def cargar_datos(temporalidad):
         FROM btc_{temporalidad.lower()}
     """
     return pd.read_sql_query(query, conn)
-
-# Inicializar los datos si aún no se han cargado
-#if st.session_state.data is None:
-#    st.session_state.data = cargar_datos('1D')  # Temporalidad por defecto
-
 # Cargar los datos por defecto si no se han cargado
 if st.session_state.data is None:
     st.session_state.data = cargar_datos(st.session_state.temporalidad_seleccionada)
@@ -87,7 +82,6 @@ def mostrar_graficos(data, predictions, temporalidad):
         largo_predictions = largo_predictions - 5
         print(largo_predictions)
         # Crear un dataframe de predicciones con fechas alineadas
-        #predictions['date'] = pd.date_range(start=data['date'].values[-largo_predictions], periods=len(predictions), freq=temporalidad)
         if (temporalidad in ['4h','4H']):
             predictions['date'] = pd.date_range(start=data['date'].values[-largo_predictions], periods=len(predictions),freq='4H')
         elif (temporalidad in ['1h','1H']):
@@ -96,7 +90,6 @@ def mostrar_graficos(data, predictions, temporalidad):
             predictions['date'] = pd.date_range(start=data['date'].values[-largo_predictions], periods=len(predictions),freq='5min')
         elif (temporalidad in ['1d','1D']):
             predictions['date'] = pd.date_range(start=data['date'].values[-largo_predictions], periods=len(predictions),freq='1D')
-        #fig.add_trace(go.Scatter(x=predictions.index, y=predictions['pred'].values, mode='lines+markers', name='Predicciones', marker=dict(color='green')))
         fig.add_trace(go.Scatter(x=predictions['date'], y=predictions['pred'].values, mode='lines+markers', name='Predicciones', marker=dict(color='green')))
     
     # Mostrar medias móviles si está seleccionado
@@ -120,7 +113,6 @@ def mostrar_graficos(data, predictions, temporalidad):
 
 
 st.set_page_config(layout="wide")  # Esto asegura que el ancho completo se use
-# Definir la función para agregar el fondo
 def set_background(image_path):
     with open(image_path, "rb") as image_file:
         #encoded_image = image_file.read()
