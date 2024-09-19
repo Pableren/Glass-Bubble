@@ -72,19 +72,34 @@ def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=No
         forecaster         = forecaster,
         y                  = data.loc[formatted_date_inicio:, 'close'],
         initial_train_size = len(data.loc[inicio_train:fin_train]),
-        fixed_train_size   = True,
+        #fixed_train_size   = True,
         steps              = 1,
-        refit              = True,
+        #refit              = True,
         metric             = 'mean_absolute_percentage_error',
         verbose            = False,
-        show_progress      = True
+        #show_progress      = True
         )
     forecaster.fit(y=data['close'])
     pred_ultimo_valor = forecaster.predict(steps=steps)
     pred_ultimo_valor = pd.DataFrame(pred_ultimo_valor)
-    predicciones_4h = pd.concat(objs=[predicciones,pred_ultimo_valor], axis=0)
-    print("metrica: ",metrica)
-    return predicciones_4h
+    print("pred_ultimo_valor: ",pred_ultimo_valor)
+    print("predicciones: ",predicciones[0])
+    print("type of predicciones",type(predicciones[0]))
+    #predicciones = pd.DataFrame(predicciones)
+    #print("ultimo valor",pred_ultimo_valor)
+    #print(type(pred_ultimo_valor))
+    #print("predic",predicciones)
+    #print(type(predicciones))
+    predic = pd.concat(objs=[pd.Series(predicciones),pred_ultimo_valor], axis=0)
+    #print("metrica: ",metrica)
+    #print("predic",predic)
+    #predic.reset_index(inplace=True,drop=True)
+    #print(predic)
+    #print(predic.columns)
+    predic.columns = ['pred']
+    #print(predic)
+    #df_pred =
+    return predic
 
 def predict_sin_exog(db_path, lags=[1,30,90,180], steps=5,temporalidad=None):
     # Cargar y preparar los datos
