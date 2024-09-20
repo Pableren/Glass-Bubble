@@ -12,6 +12,18 @@ conn = sql.connect('Data/db/btc.db')
 cursor = conn.cursor()
 
 
+
+# Inicializar session_state para datos y predicciones si no existen
+#if 'data' not in st.session_state:
+#    st.session_state.data = None
+#if 'predictions' not in st.session_state:
+#    st.session_state.predictions = None
+#if 'temporalidad_seleccionada' not in st.session_state:
+#    st.session_state.temporalidad_seleccionada = '1D'  # Temporalidad por defecto
+
+
+
+#AGG
 # Inicializar session_state para datos y predicciones si no existen
 if 'data' not in st.session_state:
     st.session_state.data = None
@@ -19,6 +31,20 @@ if 'predictions' not in st.session_state:
     st.session_state.predictions = None
 if 'temporalidad_seleccionada' not in st.session_state:
     st.session_state.temporalidad_seleccionada = '1D'  # Temporalidad por defecto
+if 'actualizar_panel' not in st.session_state:
+    st.session_state.actualizar_panel = False  # Flag para actualizar el panel
+
+#AGG
+# Función para actualizar el panel de manera manual
+def actualizar_panel():
+    st.session_state.data = cargar_datos(st.session_state.temporalidad_seleccionada)
+    st.session_state.actualizar_panel = False  # Resetear flag después de la actualización
+    
+def entrenar_y_predecir(temporalidad):
+    data, predictions = f.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
+    st.session_state.data = data
+    st.session_state.predictions = predictions
+    st.session_state.predicciones_entrenadas = True
 
 # Función para actualizar los datos
 def actualizar_datos(temporalidad):
@@ -31,6 +57,10 @@ def actualizar_datos(temporalidad):
     elif temporalidad == '5M':
         db.actualizarData5m()
 
+    # Marcar flag para actualizar panel
+    st.session_state.actualizar_panel = True
+    #actualizar_panel_directamente()  # Asegurarse de actualizar el panel después de actualizar la data
+    
 # Función para cargar datos según la temporalidad
 def cargar_datos(temporalidad):
     query = f"""
@@ -43,12 +73,14 @@ def cargar_datos(temporalidad):
 if st.session_state.data is None:
     st.session_state.data = cargar_datos(st.session_state.temporalidad_seleccionada)
 
-def entrenar_y_predecir(temporalidad):
-    data, predictions = f.predict_sin_exog('Data/db/btc.db', temporalidad=temporalidad)
-    st.session_state.data = data
-    st.session_state.predictions = predictions
-    st.session_state.predicciones_entrenadas = True
-
+#AGG
+# Función para actualizar el panel con nuevos datos
+def actualizar_panel_directamente():
+    # Recargar los datos y actualizar los valores en session_state
+    st.session_state.data = cargar_datos(st.session_state.temporalidad_seleccionada)
+    # Resetear flag
+    st.session_state.actualizar_panel = False
+    
 def cortar_data(temporalidad):
     db.cortar_data(temporalidad=temporalidad)
     return None
@@ -67,6 +99,19 @@ def agregar_bandas_bollinger(fig, data):
     fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['LowerBand'].values[-200:], mode='lines', name='Lower Band', line=dict(color='red')))
     return fig
 
+#AGG
+# Función para actualizar el panel de información
+def update_info_panel():
+    data = st.session_state.data
+    if data is not None:
+        rsi = data['rsi'].iloc[-1]
+        cci = data['CCI'].iloc[-1]
+        k = data['K'].iloc[-1]
+        d = data['D'].iloc[-1]
+        styled_table = create_info_table_with_style(rsi=rsi, cci=cci, k=k, d=d)
+        st.markdown(styled_table, unsafe_allow_html=True)
+
+
 # Crear gráficos
 def mostrar_graficos(data, predictions, temporalidad):
     fig = go.Figure()
@@ -75,12 +120,7 @@ def mostrar_graficos(data, predictions, temporalidad):
     
     # Mostrar predicciones si está seleccionado
     if st.checkbox("Mostrar Predicciones") and predictions is not None:
-        print(type(predictions))
-        print(predictions.columns)
-        print(predictions)
-        largo_predictions = len(predictions)
-        largo_predictions = largo_predictions - 5
-        print(largo_predictions)
+        largo_predictions = len(predictions) -5 
         # Crear un dataframe de predicciones con fechas alineadas
         if (temporalidad in ['4h','4H']):
             predictions['date'] = pd.date_range(start=data['date'].values[-largo_predictions], periods=len(predictions),freq='4H')
@@ -160,14 +200,6 @@ def get_cell_style(value, threshold=30000):
         return "background-color: red; color: white;"
     return ""
 
-# Crear tablas de información para mostrar
-def create_info_table(volume, volatility):
-    return pd.DataFrame({
-        "Variable": ["Volumen", "Volatilidad"],
-        "Valor": [volume, volatility]
-    })
-
-
 # Función para generar la tabla con estilos en HTML
 def create_info_table_with_style(rsi, cci,k,d):
     # Crear la tabla en HTML
@@ -206,14 +238,18 @@ with col1:
     temporalidad_seleccionada = st.selectbox(
         "Selecciona la temporalidad",
         ['1D', '4H', '1H', '5M'],
-        index=lista_temporalidades.index(st.session_state.temporalidad_seleccionada)
-    )
-
+        index=lista_temporalidades.index(st.session_state.temporalidad_seleccionada))
+    # Antes de mostrar gráficos o panel de información
+    if st.session_state.actualizar_panel:
+        #actualizar_panel_directamente()  # Actualiza la información antes de proceder
+        update_info_panel()
+        st.session_state.actualizar_panel = False  # Restablece el flag a False
     # Guardar la temporalidad seleccionada en el estado de la sesión
     if st.session_state.temporalidad_seleccionada != temporalidad_seleccionada:
         st.session_state.temporalidad_seleccionada = temporalidad_seleccionada
         st.session_state.data = cargar_datos(temporalidad_seleccionada)  # Recargar datos al cambiar temporalidad
-
+    # Llamar a la función de actualización de panel
+    #update_info_panel()
     st.subheader("Panel de Información")
 
     # Mostrar datos técnicos
@@ -226,13 +262,9 @@ with col1:
         styled_table = create_info_table_with_style(rsi=rsi, cci=cci, k=k, d=d)
         st.markdown(styled_table, unsafe_allow_html=True)
 
-    # Botones de acción
     if st.button('Actualizar Datos'):
-        data = cargar_datos(temporalidad_seleccionada)
-        # Aquí llamas a las funciones de actualización de datos
         actualizar_datos(temporalidad_seleccionada)
-        st.session_state.data = cargar_datos(temporalidad_seleccionada)
-
+        #st.session_state.actualizar_panel = True  # Marcar para actualización del panel
     if st.button('Entrenar Modelo'):
         entrenar_y_predecir(temporalidad_seleccionada)
 
@@ -241,6 +273,9 @@ with col1:
 
 # Mostrar gráficos en la columna derecha
 with col2:
+    
+    #if st.session_state.actualizar_panel:
+        #actualizar_panel_directamente()
     if st.session_state.data is not None:
         mostrar_graficos(st.session_state.data, st.session_state.predictions, st.session_state.temporalidad_seleccionada)
     else:
