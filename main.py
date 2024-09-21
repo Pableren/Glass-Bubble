@@ -117,7 +117,6 @@ def mostrar_graficos(data, predictions, temporalidad):
     fig = go.Figure()
     # Valores reales
     fig.add_trace(go.Scatter(x=data['date'][-200:], y=data['close'].values[-200:], mode='lines+markers', name='Valores Reales', marker=dict(color='yellow', symbol='cross')))
-    
     # Mostrar predicciones si está seleccionado
     if st.checkbox("Mostrar Predicciones") and predictions is not None:
         largo_predictions = len(predictions) -5 
