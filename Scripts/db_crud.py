@@ -56,7 +56,7 @@ def insertRows(tabla):
     tabla = str(tabla)
     df = pd.read_parquet(f'Data/datasets/{tabla}.parquet',engine='pyarrow') # MODIFICAR NOMBRES
     #df = pd.read_parquet('btc_1d.parquet',engine='pyarrow')
-    print(df)
+    #print(df)
     conn = sql.connect('Data/db/btc.db')
     df.to_sql(f'{tabla}', conn, if_exists='append', index=False)
     #df.to_sql('btc_1d', conn, if_exists='append', index=False)
