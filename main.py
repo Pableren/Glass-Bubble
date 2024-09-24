@@ -10,20 +10,6 @@ import plotly.graph_objects as go
 # Conectar a la base de datos
 conn = sql.connect('Data/db/btc.db')
 cursor = conn.cursor()
-
-
-
-# Inicializar session_state para datos y predicciones si no existen
-#if 'data' not in st.session_state:
-#    st.session_state.data = None
-#if 'predictions' not in st.session_state:
-#    st.session_state.predictions = None
-#if 'temporalidad_seleccionada' not in st.session_state:
-#    st.session_state.temporalidad_seleccionada = '1D'  # Temporalidad por defecto
-
-
-
-#AGG
 # Inicializar session_state para datos y predicciones si no existen
 if 'data' not in st.session_state:
     st.session_state.data = None
@@ -58,7 +44,7 @@ def actualizar_datos(temporalidad):
         db.actualizarData5m()
 
     # Marcar flag para actualizar panel
-    st.session_state.actualizar_panel = True
+    #st.session_state.actualizar_panel = True
     #actualizar_panel_directamente()  # Asegurarse de actualizar el panel después de actualizar la data
     
 # Función para cargar datos según la temporalidad
@@ -103,6 +89,7 @@ def agregar_bandas_bollinger(fig, data):
 # Función para actualizar el panel de información
 def update_info_panel():
     data = st.session_state.data
+    st.session_state.actualizar_panel = False
     if data is not None:
         rsi = data['rsi'].iloc[-1]
         cci = data['CCI'].iloc[-1]
@@ -231,7 +218,6 @@ def create_info_table_with_style(rsi, cci,k,d):
 
 col1, col2 = st.columns([1, 3])  # Ajusta las proporciones de ancho
 
-
 with col1:
     # Selección de temporalidad
     temporalidad_seleccionada = st.selectbox(
@@ -269,7 +255,6 @@ with col1:
 
     if st.button('Recortar datos'):
         cortar_data(temporalidad_seleccionada)
-
 # Mostrar gráficos en la columna derecha
 with col2:
     
