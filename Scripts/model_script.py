@@ -23,7 +23,6 @@ def load_and_prepare_data_sin_exog(db_path,temporalidad):
     data = pd.read_sql_query(f"""SELECT date, close, volume, volatility, rsi, ma_5, ma_20, ma_100, CCI, K, D,
                MiddleBand, UpperBand, LowerBand FROM btc_{temporalidad}""", conn)
     conn.close()
-    print("data en model_script",data.tail(3))
     return data
 
 def reordenar_fechas(data,temporalidad):
@@ -56,23 +55,7 @@ def split_data(data,temporalidad):
 
 def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=None):
     forecaster = ForecasterAutoreg(regressor=LGBMRegressor(random_state=42, verbose=-1), lags=lags)
-    rsi = data['rsi'].iloc[-1]
-    cci = data['CCI'].iloc[-1]
-    k = data['K'].iloc[-1]
-    d = data['D'].iloc[-1]
-    print(rsi)
-    print(cci)
-    print(k)
-    print(d)
     data.fillna(0,inplace=True)
-    rsi = data['rsi'].iloc[-1]
-    cci = data['CCI'].iloc[-1]
-    k = data['K'].iloc[-1]
-    d = data['D'].iloc[-1]
-    print(rsi)
-    print(cci)
-    print(k)
-    print(d)
     data = reordenar_fechas(data,temporalidad=temporalidad)
     data['date'] = pd.to_datetime(data['date'])
     last_date = data['date'][-1:].values[0]
@@ -97,9 +80,9 @@ def create_train_model_sin_exog(data, lags=[1,30,90,180],steps=5,temporalidad=No
     forecaster.fit(y=data['close'])
     pred_ultimo_valor = forecaster.predict(steps=steps)
     pred_ultimo_valor = pd.DataFrame(pred_ultimo_valor)
-    print("pred_ultimo_valor: ",pred_ultimo_valor)
-    print("predicciones: ",predicciones[0])
-    print("type of predicciones",type(predicciones[0]))
+    #print("pred_ultimo_valor: ",pred_ultimo_valor)
+    #print("predicciones: ",predicciones[0])
+    #print("type of predicciones",type(predicciones[0]))
     #predicciones = pd.DataFrame(predicciones)
     predic = pd.concat(objs=[pd.Series(predicciones),pred_ultimo_valor], axis=0)
     predic.reset_index(inplace=True,drop=True)
