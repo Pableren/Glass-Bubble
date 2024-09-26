@@ -179,5 +179,19 @@ El LightGBM Regressor es un algoritmo de Machine Learning basado en un enfoque d
 Cuando se integra un modelo autoregresivo con LightGBM, los valores rezagados de la serie temporal se utilizan como características (features) en el entrenamiento del modelo. Cada fila del conjunto de entrenamiento contiene los valores pasados de la serie y el valor objetivo (el próximo valor que se desea predecir). De este modo, LightGBM aprende a optimizar la predicción ajustando las interacciones entre los valores rezagados.
 
 ### Autor:
+
+<table style="width: 100%; text-align: center; border-collapse: collapse; border-bottom: 1px solid #ccc;">
+  <tr>
+    <td style="border-right: 1px solid #ccc; border-top: 1px solid #ccc; border-bottom: none; padding: 10px;">
+      <strong>Pablo Chamena</strong><br>(Data Scientist)
+    </td>
+  </tr>
+  <tr>
+    <td style="border-right: 1px solid #ccc; border-top: none; padding: 10px;">
+      <img src="images/foto.png" alt="Pablo Chamena" width="300" height="200">
+    </td>
+  </tr>
+</table>
+
 Pablo Chamena
 - Linkedin: https://www.linkedin.com/in/pablo-chamena-8814bb211/
