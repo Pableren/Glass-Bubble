@@ -10,7 +10,9 @@
 2. [Instalacion y requisitos](#instalacion-y-requisitos)
 3. [Objetivos](#objetivos)
 4. [Entregables](#entregables)
-5. [Data Engineer](#data-engineer)
+5. [Data Engineering](#data-engineer)
+6. [Data Analysis](#data-analysis)
+6. [Data Science](#data-science)
 6. [Autor](#autor)
 
 
@@ -166,7 +168,9 @@ Se comenzo utilizando un dataset con los valores diarios del bitcoin.
 
 Para los datos de 4 horas, 1 hora y 5 minutos, se extrayeron utilizando la api de cctx la cual se encarga de realizar las llamadas a las api, donde se modifican los parametros para extraer los datos correctos.
 
-### Puntos clave
+### Funcion de actualizacion: Actualizacion y carga incremental de la data.
+
+Esta función actualiza los datos de velas diarias (1d,4h,1h y 5min) de Bitcoin, obteniendo información desde un exchange y almacenándola en una base de datos SQLite.
 
 - El parámetro **since** se utiliza para especificar desde qué fecha se extraen los datos históricos. Este valor se calcula a partir de la fecha más reciente (date_old) en la base de datos, transformándola en un timestamp en milisegundos.
 El parametro since, cuando realizamo la primera extraccion de los datos, le restamos valores(correspondientes a la cantidad de datos extraidos por llamada) para poder ir extrayendo datos cada vez mas antiguos, hasta conseguir todos los datos historicos que necesitemos.
@@ -176,16 +180,27 @@ El parametro since, cuando realizamo la primera extraccion de los datos, le rest
 
 - **Ciclo de actualización**: Mientras haya más de X minutos de diferencia (equivalente a la diferencia entre un registro y otro. 1d=1440min,1h=60min,etc) entre la última fecha de la base de datos y la fecha actual, el ciclo sigue obteniendo y almacenando datos. Cada vez que se obtiene un lote de datos, se actualiza el parámetro since sumando el valor de un año.
 
-## Upgrades:
+## Data Analysis
 
-- Posible mejora, al integrar todos los pasos las extracciones y la generacion de la base de datos, en un mismo archivo.py.
+**Preparación y análisis de datos**
+- Frecuencia de los datos: Se utilizaron datos en intervalos de 4 horas para capturar movimientos de precios más granulares.
+- Distribución de precios: la mayoría de los precios de Bitcoin están por debajo de los 20 000 USD, en particular en el período comprendido entre 2013 y septiembre de 2020. Sin embargo, desde 2021, los precios han sido significativamente más altos, oscilando entre 35 000 USD y 67 500 USD.
 
-- Emplear una mejora respecto a la extraccion de datos.
-Las funciones de actualizacion de los datos, presentan una posible mejora respecto a que al terminar de leer los datos, se vuelve a leer la totalidad del dataset y se aplica nuevamente el proceso de creacion de columnas calculadas. Considerar la forma de que esto solo se realice sobre los ultimos datos solamente y concatenando ambos dataframes(antiguo y nuevo).
+**Desafíos y estrategias de modelado**
+- Distribución asimétrica y diferentes órdenes de magnitud: modelar series temporales con estas características puede ser complejo.
+- Modelado de deltas: se consideraria utilizar deltas (cambios en el precio) en lugar de valores directos puede simplificar el modelado al reducir el impacto de la distribución asimétrica y la alta volatilidad.
 
-- Considerar funciones que puedan ser ejecutadas por fuera del main, para alivinar el proceso de ejecucion de las funciones en el archivo main.py
+## Data Science
 
-- Emplear una eficientizacion respecto a las variables que se manipulan dentro de main para eliminar variables o archivos que puedan acumular datos en memoria.
+Se utilizo un forecaster(pronosticador) autoregresivo con LGBMRegressor que utiliza valores pasados de una serie de tiempo para predecir valores futuros. Funciona al entrenar un modelo Light Gradient Boosting Machine (LGBMRegressor) con los valores históricos de la serie. El LGBMRegressor, una técnica de boosting de gradiente, aprende las relaciones entre los valores pasados y crea un modelo que puede extrapolar estas relaciones para realizar predicciones. En esencia, el modelo busca patrones en los datos históricos y utiliza estos patrones para pronosticar cómo evolucionará la serie en el futuro.
+
+Respecto al bloque de ciencia de datos, ¿porque se decidio utilizar este modelo?
+
+Los modelos autoregresivos son especialmente diseñados para predecir valores futuros de una serie temporal basándose en sus valores pasados. Esto consideramos es ideal ya que el precio puede estar fuertemente influenciado por su historial y tiende a seguir ciertos patrones. Ademas de la **flexibilidad** que permiten estos modelos al poder incorporar múltiples variables exogenas que pueden llegar a influir en el precio.
+
+El modelo LGBMRegressor permite trabajar con datos numéricos y categóricos ademas de poder incoporar técnicas para evitar el sobreajuste.
+
+
 
 ### Autor:
 Pablo Chamena
