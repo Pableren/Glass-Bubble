@@ -204,5 +204,4 @@ El modelo LGBMRegressor permite trabajar con datos numéricos y categóricos ade
 
 ### Autor:
 Pablo Chamena
-- Linkedin:
-- Github:
+- Linkedin: https://www.linkedin.com/in/pablo-chamena-8814bb211/
