@@ -2,7 +2,7 @@
 
 <img src="images/bola_cristal.jfif" width="300" height="300">
 
-### Glass Bubble se destaca en el mercado por ofrecer servicios de monitorio y seguimiento de modelos de ML y DP.
+### Glass Bubble se destaca en el mercado por ofrecer servicios de monitoreo y seguimiento de modelos de ML y DP.
 
 ### Tabla de contenidos
 
@@ -10,7 +10,8 @@
 2. [Instalacion y requisitos](#instalacion-y-requisitos)
 3. [Objetivos](#objetivos)
 4. [Entregables](#entregables)
-5. [Autor](#autor)
+5. [Data Engineer](#data-engineer)
+6. [Autor](#autor)
 
 
 
@@ -158,6 +159,22 @@ Detalla la arquitectura: ¿Cómo se conectan los diferentes componentes del tabl
 * **Uso:** Señales de sobrecompra cuando el CCI está por encima de un nivel determinado (generalmente 100) y de sobreventa cuando está por debajo de otro nivel (generalmente -100).
 
 **Nota:** Estos indicadores son herramientas de análisis técnico y no garantizan resultados futuros. Es importante utilizarlos en combinación con otros análisis y considerar el contexto del mercado.
+
+## Data Engineer
+
+Se comenzo utilizando un dataset con los valores diarios del bitcoin.
+
+Para los datos de 4 horas, 1 hora y 5 minutos, se extrayeron utilizando la api de cctx la cual se encarga de realizar las llamadas a las api, donde se modifican los parametros para extraer los datos correctos.
+
+### Puntos clave
+
+- El parámetro **since** se utiliza para especificar desde qué fecha se extraen los datos históricos. Este valor se calcula a partir de la fecha más reciente (date_old) en la base de datos, transformándola en un timestamp en milisegundos.
+El parametro since, cuando realizamo la primera extraccion de los datos, le restamos valores(correspondientes a la cantidad de datos extraidos por llamada) para poder ir extrayendo datos cada vez mas antiguos, hasta conseguir todos los datos historicos que necesitemos.
+
+
+- **Verificación y almacenamiento**: Se verifica si los datos obtenidos ya existen en la base de datos, comparando las fechas (time) y añadiendo únicamente los datos faltantes.
+
+- **Ciclo de actualización**: Mientras haya más de X minutos de diferencia (equivalente a la diferencia entre un registro y otro. 1d=1440min,1h=60min,etc) entre la última fecha de la base de datos y la fecha actual, el ciclo sigue obteniendo y almacenando datos. Cada vez que se obtiene un lote de datos, se actualiza el parámetro since sumando el valor de un año.
 
 ## Upgrades:
 
