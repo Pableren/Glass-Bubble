@@ -188,7 +188,7 @@ Cuando se integra un modelo autoregresivo con LightGBM, los valores rezagados de
   </tr>
   <tr>
     <td style="border-right: 1px solid #ccc; border-top: none; padding: 10px;">
-      <img src="images/foto.png" alt="Pablo Chamena" width="300" height="200">
+      <img src="images/foto.png" alt="Pablo Chamena" width="200" height="140">
     </td>
   </tr>
 </table>
