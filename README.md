@@ -161,10 +161,12 @@ El parametro since, cuando realizamo la primera extraccion de los datos, le rest
 
 ## Data Science
 
-El precio del Bitcoin es altamente volátil debido a:
+Cabe destacar que el precio del Bitcoin es altamente volátil debido a:
 - Su naturaleza descentralizada: Sin un banco central que controle la oferta, el mercado es más susceptible a cambios bruscos.
 - Factores externos impredecibles: Noticias, regulaciones y la psicología de los inversores influyen directamente en el precio.
 - Al ser un activo nuevo, los patrones históricos no siempre son confiables para predecir su comportamiento.
+
+Considerando estos factores, se procedio a crear el modelo.
 
 Se utilizo un forecaster(pronosticador) autoregresivo con LGBMRegressor que utiliza valores pasados de una serie de tiempo para predecir valores futuros. Funciona al entrenar un modelo Light Gradient Boosting Machine (LGBMRegressor) con los valores históricos de la serie. El LGBMRegressor, una técnica de boosting de gradiente, aprende las relaciones entre los valores pasados y crea un modelo que puede extrapolar estas relaciones para realizar predicciones. En esencia, el modelo busca patrones en los datos históricos y utiliza estos patrones para pronosticar cómo evolucionará la serie en el futuro.
 
@@ -193,5 +195,4 @@ Cuando se integra un modelo autoregresivo con LightGBM, los valores rezagados de
   </tr>
 </table>
 
-Pablo Chamena
 - Linkedin: https://www.linkedin.com/in/pablo-chamena-8814bb211/
