@@ -61,6 +61,8 @@ Modelo de Machine Learning
 
 **Tablero interactivo**
 
+<img src="images/interactive_graph.png" width="1000" height="500">
+
 El tablero se realizara usando Dash y demas librerias de python.
 
 **Componentes**:
