@@ -56,14 +56,6 @@ Modelo de Machine Learning
 - ForecasterAutoreg()
 - LGBMRegresor()
 
-## Objetivos
-
-Tablero interactivo con informacion acerca del activo.
-
-Objetivos específicos: ¿Qué acciones espera que los usuarios realicen con el tablero? ¿Tomar decisiones de inversión, monitorear el mercado, comparar activos? Definir objetivos claros ayudará a orientar el diseño y las funcionalidades.
-
-Métricas de éxito: ¿Cómo se medirá el éxito del tablero? ¿Número de usuarios, tiempo de uso, precisión de las predicciones? Establecer métricas te permitirá evaluar el desempeño del proyecto y realizar ajustes si es necesario.
-
 
 ## Entregables
 
@@ -93,33 +85,14 @@ El usuario atravez del tablero puede ejecutar 4 acciones:
 
 - Reentrenar modelo, al ejecutarse se volvera a entrenar el modelo con los ultimos datos y generar predicciones en tiempo real.
 
-- Depurar, al ejecutarse, se reduciran los datos cargados en la base de datos con el fin de no almacenar datos mas antiguos de lo que el modelo requiere.
+- Recortar, al ejecutarse, se reduciran los datos cargados en la base de datos con el fin de no almacenar datos mas antiguos de lo que el modelo requiere.
 
 - Eleccion del marco temporal del tablero.
 
 El tablero incluye un panel interactivo que permite a los usuarios explorar los datos del activo en diferentes escalas temporales. Al seleccionar un marco temporal determinado (1 día, 4 horas, 1 hora o 5 minutos), el panel se actualizará automáticamente para mostrar los indicadores más importantes calculados sobre los datos de ese período.
 
-### Logica de las predicciones
 
-#### Aclaracion: El precio del bitcoin es influenciado por muchos valores externos, y es verdaderamente complicado tambien asi, demostrar que esos valores externos son realmente la causa del valor del activo y no una casualidad debido a que: *correlacion no implica causalidad*. Dicho esto, el modelo utilizado fue un ForecasterAutoregresivo.
-
-El precio del Bitcoin es altamente volátil debido a:
-- Su naturaleza descentralizada: Sin un banco central que controle la oferta, el mercado es más susceptible a cambios bruscos.
-- Factores externos impredecibles: Noticias, regulaciones y la psicología de los inversores influyen directamente en el precio.
-- Al ser un activo nuevo, los patrones históricos no siempre son confiables para predecir su comportamiento.
-
-Explica la lógica de las predicciones: ¿Qué tipo de modelo de machine learning se utilizará? ¿Cuáles son las características que se utilizarán para realizar las predicciones?
-Detalla la arquitectura: ¿Cómo se conectan los diferentes componentes del tablero? ¿Cuál es el flujo de datos desde la API hasta la interfaz de usuario?
-
-#### ¿Porque se eligio un ForecasterAutoregresivo?
-
-- Captura de dependencias temporales: Los modelos autoregresivos están diseñados para capturar la dependencia entre los valores pasados y futuros de una serie de tiempo, lo que es fundamental para realizar predicciones precisas.
-- Manejo de series de tiempo con estacionalidad: LightGBM puede manejar fácilmente la estacionalidad en las series de tiempo, lo que es común en muchos conjuntos de datos reales.
-- Alta precisión: LightGBM es un algoritmo de boosting muy eficiente y preciso, lo que lo convierte en una excelente opción para modelos de predicción de series de tiempo.
-- Flexibilidad: Permite la creación de modelos complejos que combinan múltiples características y técnicas de modelado.
-
-
-### Variables Sinteticas: Panel de informacion
+### Variables Sinteticas: Panel de informacion y variables para el grafico
 
 #### 1. Promedio Móvil (Moving Average, MA)
 * **Concepto:** Es un indicador que suaviza los datos de precios al calcular el promedio del precio de cierre durante un período específico.
@@ -127,14 +100,7 @@ Detalla la arquitectura: ¿Cómo se conectan los diferentes componentes del tabl
   * **Corto plazo:** Refleja tendencias más recientes del precio.
   * **Largo plazo:** Muestra la tendencia general del precio a largo plazo.
 * **Uso:** Se utiliza para identificar tendencias alcistas (precio por encima del MA) o bajistas (precio por debajo del MA).
-
-#### 2. MACD (Moving Average Convergence Divergence)
-* **Concepto:** Mide la relación entre dos promedios móviles para generar una señal de compra o venta.
-* **Componentes:**
-  * **Línea MACD:** Diferencia entre dos promedios móviles (generalmente 12 y 26 períodos).
-  * **Señal MACD:** Promedio móvil de la línea MACD (generalmente 9 períodos).
-  * **Histograma MACD:** Diferencia entre la línea MACD y la señal MACD.
-* **Uso:** Señales de compra cuando la línea MACD cruza por encima de la señal MACD y de venta cuando ocurre lo contrario. El histograma refuerza estas señales.
+- En el grafico interactivo se presentan como medias.
 
 #### 3. Bandas de Bollinger
 * **Concepto:** Miden la volatilidad del precio en relación a un promedio móvil.
@@ -143,6 +109,7 @@ Detalla la arquitectura: ¿Cómo se conectan los diferentes componentes del tabl
   * **Banda superior:** Media móvil más dos desviaciones estándar.
   * **Banda inferior:** Media móvil menos dos desviaciones estándar.
 * **Uso:** Cuando el precio toca las bandas, puede indicar sobrecompra (banda superior) o sobreventa (banda inferior).
+- bandas en el grafico interactivo.
 
 #### 4. Oscilador Estocástico
 * **Concepto:** Mide el precio de cierre en relación al rango de precios de un período determinado.
@@ -192,6 +159,11 @@ El parametro since, cuando realizamo la primera extraccion de los datos, le rest
 
 ## Data Science
 
+El precio del Bitcoin es altamente volátil debido a:
+- Su naturaleza descentralizada: Sin un banco central que controle la oferta, el mercado es más susceptible a cambios bruscos.
+- Factores externos impredecibles: Noticias, regulaciones y la psicología de los inversores influyen directamente en el precio.
+- Al ser un activo nuevo, los patrones históricos no siempre son confiables para predecir su comportamiento.
+
 Se utilizo un forecaster(pronosticador) autoregresivo con LGBMRegressor que utiliza valores pasados de una serie de tiempo para predecir valores futuros. Funciona al entrenar un modelo Light Gradient Boosting Machine (LGBMRegressor) con los valores históricos de la serie. El LGBMRegressor, una técnica de boosting de gradiente, aprende las relaciones entre los valores pasados y crea un modelo que puede extrapolar estas relaciones para realizar predicciones. En esencia, el modelo busca patrones en los datos históricos y utiliza estos patrones para pronosticar cómo evolucionará la serie en el futuro.
 
 Respecto al bloque de ciencia de datos, ¿porque se decidio utilizar este modelo?
@@ -200,7 +172,9 @@ Los modelos autoregresivos son especialmente diseñados para predecir valores fu
 
 El modelo LGBMRegressor permite trabajar con datos numéricos y categóricos ademas de poder incoporar técnicas para evitar el sobreajuste.
 
+El LightGBM Regressor es un algoritmo de Machine Learning basado en un enfoque de gradient boosting sobre árboles de decisión. Este método construye múltiples árboles secuencialmente, donde cada nuevo árbol corrige los errores del anterior.
 
+Cuando se integra un modelo autoregresivo con LightGBM, los valores rezagados de la serie temporal se utilizan como características (features) en el entrenamiento del modelo. Cada fila del conjunto de entrenamiento contiene los valores pasados de la serie y el valor objetivo (el próximo valor que se desea predecir). De este modo, LightGBM aprende a optimizar la predicción ajustando las interacciones entre los valores rezagados.
 
 ### Autor:
 Pablo Chamena
