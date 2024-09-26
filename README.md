@@ -8,7 +8,7 @@
 
 1. [Contexto](#contexto)
 2. [Instalacion y requisitos](#instalacion-y-requisitos)
-3. [Objetivos](#objetivos)
+3. [Diagrama de Flujo](#diagrama-de-flujo)
 4. [Entregables](#entregables)
 5. [Data Engineering](#data-engineer)
 6. [Data Analysis](#data-analysis)
@@ -56,6 +56,9 @@ Modelo de Machine Learning
 - ForecasterAutoreg()
 - LGBMRegresor()
 
+## Diagrama de flujo
+
+<img src="images/flujo.png" width="500" height="500">
 
 ## Entregables
 
