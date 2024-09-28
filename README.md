@@ -134,7 +134,9 @@ El tablero incluye un panel interactivo que permite a los usuarios explorar los 
 
 **Nota:** Estos indicadores son herramientas de análisis técnico y no garantizan resultados futuros. Es importante utilizarlos en combinación con otros análisis y considerar el contexto del mercado.
 
-## Data Engineer
+## :hammer: Data Engineer :hammer:
+
+:hammer:
 
 Se comenzo utilizando un dataset con los valores diarios del bitcoin.
 
