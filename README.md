@@ -135,9 +135,7 @@ El tablero incluye un panel interactivo que permite a los usuarios explorar los 
 **Nota:** Estos indicadores son herramientas de análisis técnico y no garantizan resultados futuros. Es importante utilizarlos en combinación con otros análisis y considerar el contexto del mercado.
 
 ## Data Engineering
-### :hammer: ETL :hammer:
-
-**asdasd**
+### :hammer: ETL :wrench:
 
 Se comenzo utilizando un dataset con los valores diarios del bitcoin.
 
@@ -156,6 +154,19 @@ El parametro since, cuando realizamo la primera extraccion de los datos, le rest
 - **Ciclo de actualización**: Mientras haya más de X minutos de diferencia (equivalente a la diferencia entre un registro y otro. 1d=1440min,1h=60min,etc) entre la última fecha de la base de datos y la fecha actual, el ciclo sigue obteniendo y almacenando datos. Cada vez que se obtiene un lote de datos, se actualiza el parámetro since sumando el valor de un año.
 
 ## Data Analysis
+Antes de analizar una serie temporal, es importante tener en cuenta algunos conceptos, uno de ellos es la autocorrelacion.
+
+La **autocorrelación** mide el grado de similitud entre una serie temporal y una versión desplazada de ella misma (lag). Básicamente, evalúa si los valores anteriores de la serie tienen alguna relación con los valores futuros. Si la autocorrelación es alta, significa que la serie tiene un patrón repetitivo o tendencial; si es baja o negativa, los valores son más independientes entre sí.
+
+### :chart_with_upwards_trend: Autocorrelacion :chart_with_downwards_trend:
+
+Los gráficos de autocorrelación indican que el lag 1 es el único que está correlacionado con el lag 0. Los siguientes lags no superan el umbral de significancia.
+
+El gráfico muestra una disminución progresiva de la autocorrelación conforme aumenta el número de lags. El primer lag parece estar correlacionado fuertemente con el lag 0 (es decir, el valor inmediato anterior), lo que indica que la serie temporal es fuertemente dependiente del valor inmediatamente anterior.
+
+En series temporales financieras como Bitcoin, es común que el valor del periodo inmediatamente anterior (lag 1) sea altamente predictivo del valor actual debido a la inercia o persistencia de los precios.
+
+Esto se debe a la naturaleza persistente de los mercados financieros, donde los precios tienden a seguir una tendencia o continuar el mismo comportamiento en cortos periodos de tiempo. En este caso, los valores anteriores influyen en los futuros de forma más inmediata.
 
 **Preparación y análisis de datos**
 - Frecuencia de los datos: Se utilizaron datos en intervalos de 4 horas para capturar movimientos de precios más granulares.
@@ -173,6 +184,8 @@ Cabe destacar que el precio del Bitcoin es altamente volátil debido a:
 - Al ser un activo nuevo, los patrones históricos no siempre son confiables para predecir su comportamiento.
 
 Considerando estos factores, se procedio a crear el modelo.
+
+### :crystal_ball: Modelo :crystal_ball:
 
 Se utilizo un forecaster(pronosticador) autoregresivo con LGBMRegressor que utiliza valores pasados de una serie de tiempo para predecir valores futuros. Funciona al entrenar un modelo Light Gradient Boosting Machine (LGBMRegressor) con los valores históricos de la serie. El LGBMRegressor, una técnica de boosting de gradiente, aprende las relaciones entre los valores pasados y crea un modelo que puede extrapolar estas relaciones para realizar predicciones. En esencia, el modelo busca patrones en los datos históricos y utiliza estos patrones para pronosticar cómo evolucionará la serie en el futuro.
 
