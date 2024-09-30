@@ -66,7 +66,7 @@ Modelo de Machine Learning
 
 <img src="images/interactive_graph.png" width="1000" height="500">
 
-El tablero se realizara usando Dash y demas librerias de python.
+El tablero se realizara usando Streamlit, una libreria de python.
 
 **Componentes**:
 - 4 Graficas(24h,4h,1h,5m) interactivas con valor real y prediccion futura.
@@ -107,7 +107,7 @@ El tablero incluye un panel interactivo que permite a los usuarios explorar los 
 * **Uso:** Se utiliza para identificar tendencias alcistas (precio por encima del MA) o bajistas (precio por debajo del MA).
 - En el grafico interactivo se presentan como medias.
 
-#### 3. Bandas de Bollinger
+#### 2. Bandas de Bollinger
 * **Concepto:** Miden la volatilidad del precio en relación a un promedio móvil.
 * **Componentes:**
   * **Media móvil:** Promedio del precio de cierre durante un período específico.
@@ -116,19 +116,19 @@ El tablero incluye un panel interactivo que permite a los usuarios explorar los 
 * **Uso:** Cuando el precio toca las bandas, puede indicar sobrecompra (banda superior) o sobreventa (banda inferior).
 - bandas en el grafico interactivo.
 
-#### 4. Oscilador Estocástico
+#### 3. Oscilador Estocástico
 * **Concepto:** Mide el precio de cierre en relación al rango de precios de un período determinado.
 * **Componentes:**
   * **%K:** Porcentaje que indica la posición del precio de cierre en relación al rango de precios.
   * **%D:** Promedio móvil del %K.
 * **Uso:** Señales de sobrecompra cuando %K y %D están por encima de un nivel determinado (generalmente 80) y de sobreventa cuando están por debajo de otro nivel (generalmente 20).
 
-#### 5. Índice de Fuerza Relativa (RSI)
+#### 4. Índice de Fuerza Relativa (RSI)
 * **Concepto:** Mide la velocidad y el cambio de los precios.
 * **Uso:** Señales de sobrecompra cuando el RSI está por encima de un nivel determinado (generalmente 70) y de sobreventa cuando está por debajo de otro nivel (generalmente 30).
 
 
-#### 6. Índice de Canal de Materias Primas (CCI)
+#### 5. Índice de Canal de Materias Primas (CCI)
 * **Concepto:** Mide la desviación del precio en relación a un promedio móvil.
 * **Uso:** Señales de sobrecompra cuando el CCI está por encima de un nivel determinado (generalmente 100) y de sobreventa cuando está por debajo de otro nivel (generalmente -100).
 
