@@ -58,7 +58,7 @@ Modelo de Machine Learning
 
 ## Diagrama de flujo
 
-<img src="images/flujo.png" width="500" height="500">
+<img src="images/df.png" width="500" height="500">
 
 ## Entregables
 
