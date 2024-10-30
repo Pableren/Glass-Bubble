@@ -215,3 +215,4 @@ Cuando se integra un modelo autoregresivo con LightGBM, los valores rezagados de
 </table>
 
 - Linkedin: https://www.linkedin.com/in/pablo-chamena-8814bb211/
+- Video: https://www.youtube.com/watch?v=MLEL1mL19vg&t=7s
